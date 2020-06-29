@@ -98,7 +98,7 @@ func check(e error) {
     }
 }
 
-
+/* 
 func DecompressHGT(){
 	filename := "C:\\Users\\Miguel\\Documents\\repos\\wfire\\wfire\\src\\test_data\\N38W009.hgt.gz"
 	f, _ := os.Open(filename)
@@ -127,7 +127,7 @@ func ConvertBigEndian(){
 	fmt.Println(converted)
  
 
-}
+} */
 
 /*
 
