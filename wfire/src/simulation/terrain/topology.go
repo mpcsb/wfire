@@ -10,12 +10,6 @@ import (
 	"strconv"
 )
 
-type cart_coord struct {
-	x   float64
-	y   float64
-	alt float64
-}
-
 type geo_coord struct {
 	lat float64
 	lon float64
@@ -73,7 +67,6 @@ func genDimensions() (float64, float64) {
 }
 
 func GenerateTerrain() terrain {
-
 	//extractCoordinates()
 	coord_lst := rawTerrain()
 
@@ -82,6 +75,5 @@ func GenerateTerrain() terrain {
 		t.coords = append(t.coords, geo_coord{lat: v[0], lon: v[1], alt: v[2]})
 	}
 	t.width, t.length = genDimensions()
-
 	return t
 }

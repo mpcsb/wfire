@@ -1,5 +1,11 @@
 elevation_data/
 
-pkg/mod/
+pkg/
 
 pkg/sumdb/
+
+src/bin/
+
+src/cmd/run.exe
+
+bin/
