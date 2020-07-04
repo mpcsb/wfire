@@ -8,16 +8,16 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+
+	"github.com/im7mortal/UTM"
 )
 
-type geo_coord struct {
-	lat float64
-	lon float64
-	alt float64
+type Coord struct {
+	lat, lon, alt float64
 }
 
 type terrain struct {
-	coords []geo_coord
+	Coords []Coord
 	width  float64
 	length float64
 }
@@ -27,6 +27,8 @@ func extractCoordinates() {
 	filePath, _ := filepath.Abs("../../simulation/terrain/HGT/HGT_parser.py")
 	params := " -lat1 38.123 -lon1 12.455 -lat2 38.145 -lon2 12.489"
 	command := filePath + params
+
+	fmt.Println(command)
 	cmd := exec.Command(python_exec, command)
 	err := cmd.Run()
 	fmt.Println(err)
@@ -35,7 +37,6 @@ func extractCoordinates() {
 func rawTerrain() [][]float64 {
 
 	filePath, _ := filepath.Abs("../../simulation/terrain/HGT/coords.csv")
-	//fmt.Println("file is:", filePath)
 	f, _ := os.Open(filePath)
 
 	terrain := [][]float64{} // list of geo coordinates
@@ -61,19 +62,20 @@ func rawTerrain() [][]float64 {
 	return terrain
 }
 
-func genDimensions() (float64, float64) {
-	fmt.Println("TODO")
-	return 0.0, 0.2
+func genDimensions(p1 Coord, p2 Coord) (float64, float64) {
+	x1, y1, _, _, _ := UTM.FromLatLon(p1.lat, p1.lon, true)
+	x2, y2, _, _, _ := UTM.FromLatLon(p2.lat, p2.lon, true)
+	return x2 - x1, y2 - y1
 }
 
-func GenerateTerrain() terrain {
-	//extractCoordinates()
+func GenerateTerrain(p1 Coord, p2 Coord) terrain {
+	extractCoordinates()
 	coord_lst := rawTerrain()
 
 	t := terrain{}
 	for _, v := range coord_lst {
-		t.coords = append(t.coords, geo_coord{lat: v[0], lon: v[1], alt: v[2]})
+		t.Coords = append(t.Coords, Coord{lat: v[0], lon: v[1], alt: v[2]})
 	}
-	t.width, t.length = genDimensions()
+	t.width, t.length = genDimensions(p1, p2)
 	return t
 }

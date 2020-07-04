@@ -1,8 +1,10 @@
 package flora
 
-type coord struct {
-	lat, lon, alt float64
-}
+import "simulation/terrain"
+
+// type Coord struct {
+// 	lat, lon, alt float64
+// }
 
 type xy_coor struct {
 	x, y float64
@@ -22,10 +24,10 @@ type tree_dynamic struct {
 	biomass  float64
 }
 
-type tree_data struct {
+type Tree_data struct {
 	ID      int
 	species string
-	coords  coord
+	coords  terrain.Coord
 	x_y     xy_coor
 	static  tree_static
 	dynamic tree_dynamic
@@ -34,37 +36,31 @@ type tree_data struct {
 	neighbours   []int
 }
 
-type dimKeys struct {
-	species      string
-	north_facing string
-}
+//var treeDimensions map[string][]float64
 
-//var treeDimensions map[dimKeys][]float64
-
-func createTree(id int, species string) tree_data {
-	t := tree_data{ID: id}
+func CreateTree(id int, p terrain.Coord, species string, tree_db map[string][5]float64) Tree_data {
+	t := Tree_data{ID: id}
 	t.species = species
-	//initStatic(t)
+	initStatic(t, tree_db)
 	initBiomass(t)
 	return t
 }
 
-/* func initStatic(t tree_data) {
-	k := dimKeys{species: t.species, north_facing: t.north_facing}
-	dims := treeDimensions[k]
+func initStatic(t Tree_data, tree_db map[string][5]float64) {
+	dims := tree_db[t.species]
 
 	t.static.height = dims[0]
 	t.static.diameter_breast_height = dims[1]
 	t.static.bark_thickness = dims[2]
 	t.static.crown_radius = dims[3]
 	t.static.flammability = dims[4]
-} */
-
-func initBiomass(t tree_data) {
-	t.dynamic.biomass = t.static.height*t.static.diameter_breast_height + t.static.crown_radius
 }
 
-func updateMoisture(t tree_data, temp float64) {
+func initBiomass(t Tree_data) {
+	t.dynamic.biomass = t.static.height * t.static.diameter_breast_height * t.static.crown_radius
+}
+
+func updateMoisture(t Tree_data, temp float64) {
 	temp_diff := temp - 25.0 // 25ºC to be defined
 	diff := 0.0
 	if temp_diff > 0 {
@@ -76,6 +72,6 @@ func updateMoisture(t tree_data, temp float64) {
 }
 
 type tree interface {
-	createTree()
+	CreateTree()
 	updateMoisture()
 }
