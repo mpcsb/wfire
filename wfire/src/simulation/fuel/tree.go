@@ -1,10 +1,6 @@
-package flora
+package fuel
 
-import "simulation/terrain"
-
-// type Coord struct {
-// 	lat, lon, alt float64
-// }
+import "simulation/shared"
 
 type xy_coor struct {
 	x, y float64
@@ -27,7 +23,7 @@ type tree_dynamic struct {
 type Tree_data struct {
 	ID      int
 	species string
-	coords  terrain.Coord
+	coords  shared.Coord
 	x_y     xy_coor
 	static  tree_static
 	dynamic tree_dynamic
@@ -36,7 +32,7 @@ type Tree_data struct {
 	neighbours   []int
 }
 
-func CreateTree(id int, p terrain.Coord, species string, tree_db map[string][5]float64) Tree_data {
+func CreateTree(id int, p shared.Coord, species string, tree_db map[string][5]float64) Tree_data {
 	t := Tree_data{ID: id}
 	t.species = species
 	initStatic(t, tree_db)

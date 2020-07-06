@@ -2,11 +2,8 @@ import os
 from math import floor
 import gzip
 import argparse
-import csv
-
-
-print("hello")
-import numpy as np
+import csv 
+# import numpy as np
 from tqdm import tqdm
 from gmalthgtparser import HgtParser   
 
@@ -20,9 +17,7 @@ try:
     # args = parser.parse_args()
     args, unknown = parser.parse_known_args()
 
-    os.chdir(args.wdir)
-    # lat1 = args.lat1
-    # print('test ok', lat1)
+    os.chdir(args.wdir) 
 except Exception as e:
     print(e)
 lat1 = args.lat1
@@ -33,6 +28,9 @@ lon2 = args.lon2
 p1 = (lat1, lon1)
 p2 = (lat2, lon2)
 
+
+def linspace(lower, upper, num):  
+    return [lower + x*(upper-lower)/num for x in range(num)]
 
 def filename_gen(lat, lon):
     ''' receives coordinates used to select hgt file'''
@@ -69,13 +67,12 @@ def filename_gen(lat, lon):
     return  fname
 
 
-def generate_topology(p1, p2, n_points=100): 
+def generate_topology(p1, p2, n_points=100):  
+    np_lat = linspace(p1[0], p2[0], num=n_points )
+    np_lon = linspace(p1[1], p2[1], num=n_points )
     
-    np_lat = np.linspace(p1[0], p2[0], num=n_points, endpoint=True)
-    np_long = np.linspace(p1[1], p2[1], num=n_points, endpoint=True)
-    coords_lat_lon = [(lat, long) for lat in list(np_lat) for long in list(np_long)]
-    
-    
+    coords_lat_lon = [(lat, lon) for lat in list(np_lat) for lon in list(np_lon)]
+ 
     lat = floor(p1[0])
     lon = floor(p1[1])
         
@@ -88,6 +85,7 @@ def generate_topology(p1, p2, n_points=100):
     f = open(decompressed_file, 'wb')
     f.write(content)
     f.close()
+    
      
     terrain = list()
     with HgtParser(decompressed_file) as parser:
@@ -101,8 +99,8 @@ def generate_topology(p1, p2, n_points=100):
     return terrain
 
 
-terrain = generate_topology(p1, p2, n_points=100)
+terrain = generate_topology(p1, p2, n_points=80)
 
-with open(r'C:\Users\Miguel\Documents\repos\wfire\wfire\src\simulation\terrain\HGT\coords.csv', "w", newline="") as f:
+with open(r'C:\Users\Miguel\Documents\repos\wfire\wfire\src\simulation\terrain\temp\coords.csv', "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerows(terrain)

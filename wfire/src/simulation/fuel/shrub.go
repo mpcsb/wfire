@@ -1,4 +1,4 @@
-package flora
+package fuel
 
 type shrub_static struct {
 	height       float32
