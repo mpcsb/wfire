@@ -36,8 +36,6 @@ type Tree_data struct {
 	neighbours   []int
 }
 
-//var treeDimensions map[string][]float64
-
 func CreateTree(id int, p terrain.Coord, species string, tree_db map[string][5]float64) Tree_data {
 	t := Tree_data{ID: id}
 	t.species = species

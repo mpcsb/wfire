@@ -5,8 +5,6 @@ import (
 	"simulation/terrain"
 )
 
-// import "github.com/im7mortal/UTM"
-
 type forest struct {
 	tree_lst []flora.Tree_data
 }
@@ -18,15 +16,10 @@ func ForestGeneration(p1 terrain.Coord, p2 terrain.Coord) forest {
 	terrain_points := terrain.GenerateTerrain(p1, p2)
 
 	var f forest
-	for p := range terrain_points.Coords {
-		coordinate := terrain_points.Coords[p]
+	for i := range terrain_points.Coords {
+		coordinate := terrain_points.Coords[i]
 		t := flora.CreateTree(1, coordinate, "pine", treeDimensions)
 		f.tree_lst = append(f.tree_lst, t)
 	}
 	return f
 }
-
-// strings := []string{"hello", "world"}
-// for i, s := range strings {
-//     fmt.Println(i, s)
-// }
