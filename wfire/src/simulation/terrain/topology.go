@@ -27,14 +27,21 @@ func ExtractCoordinates(p1 Coord, p2 Coord) {
 	python_exec := "C:/Users/Miguel/Anaconda3/envs/ffire/python.exe"
 	filePath, _ := filepath.Abs("../../simulation/terrain/HGT/HGT_parser.py")
 	// params := "-lat1 38.123 -lon1 12.455 -lat2 38.145 -lon2 12.489"
-	cmd := exec.Command(python_exec, filePath, "-lat1 38.123 -lon1 12.455 -lat2 38.145 -lon2 12.489")
-
-	stdout, err := cmd.Output()
+	// args := []string{"-lat1 38.123", "-lon1 12.455", "-lat2 38.145", "-lon2 12.489"}
+	cmd := exec.Command(python_exec, filePath, "38.123", "12.455", "38.145", "12.489")
+	fmt.Println(cmd.Args)
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("Terminal error:", err.Error())
-		return
+		fmt.Println(err)
 	}
-	fmt.Println(string(stdout))
+	fmt.Println(string(out))
+
+	// stdout, err := cmd.Output()
+	// if err != nil {
+	// 	fmt.Println("Terminal error:", err.Error())
+	// 	return
+	// }
+	// fmt.Println(string(stdout))
 }
 
 func rawTerrain() [][]float64 {
