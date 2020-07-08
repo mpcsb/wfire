@@ -54,11 +54,11 @@ func initBiomass(t Tree_data) {
 	t.dynamic.biomass = t.static.height * t.static.diameter_breast_height * t.static.crown_radius
 }
 
-func updateMoisture(t Tree_data, temp float64) {
-	temp_diff := temp - 25.0 // 25ºC to be defined
+func updateMoisture(t Tree_data, temperature float64) {
+	temperature_diff := temperature - 25.0 // 25ºC to be defined
 	diff := 0.0
-	if temp_diff > 0 {
-		diff = 0.01 * temp_diff
+	if temperature_diff > 0 {
+		diff = 0.01 * temperature_diff
 	} else {
 		diff = 0
 	}

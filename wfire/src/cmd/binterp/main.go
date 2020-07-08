@@ -8,7 +8,7 @@ type point struct {
 }
 
 func f(x, y float64) float64 {
-	return 55*x + y
+	return 22*x + 3*y + 2*x*x
 }
 
 func binterp(x1, x2, y1, y2 float64, p point) float64 {
@@ -23,27 +23,15 @@ func binterp(x1, x2, y1, y2 float64, p point) float64 {
 }
 
 func main() {
-	X := 38.234
+	X := 34.234
 	Y := 9.434
 	P := point{x: X, y: Y}
 
-	x1 := 38.123
+	x1 := 32.123
 	y1 := 9.1234
 	x2 := 38.456
 	y2 := 9.3456
 
 	a := binterp(x1, x2, y1, y2, P)
-	b := binterp(y1, y2, x1, x2, P)
-	
-	c := binterp(y1, x2, y1, x2, P)
-	d := binterp(x1, y2, y1, x2, P)
-
-	fmt.Println(f(x1, y1))
-	fmt.Println(f(x2, y2))
-	fmt.Println(f(x1, y2))
-	fmt.Println(f(x2, y1))
-
-	fmt.Println(a, b, c, d)
-	fmt.Println((a + b) * 0.5)
-	fmt.Println(f(X, Y))
+	fmt.Println(a, f(X, Y))
 }

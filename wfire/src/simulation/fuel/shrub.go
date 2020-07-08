@@ -7,4 +7,5 @@ type shrub_static struct {
 
 type shrub_dynamic struct {
 	moisture float32
+	state    string
 }
