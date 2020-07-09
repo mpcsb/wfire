@@ -1,7 +1,3 @@
-// Copyright ©2019 The Gonum Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -19,7 +15,7 @@ func main() {
 	var stations = []vptree.Comparable{
 		place{name: "00", lat: 51.0 + r.Float64(), lon: r.Float64()},
 	}
-	for i := 0; i < 10000000; i++ {
+	for i := 0; i < 1000000; i++ {
 		new_place := place{name: fmt.Sprintf("%d", i), lat: 51.0 + r.Float64(), lon: r.Float64()}
 		stations = append(stations, new_place)
 	}
@@ -32,22 +28,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Residence.
-	q := place{lat: 51.501476, lon: 0.140634}
+	for index, q := range stations {
+		// Residence.
+		// q := place{lat: 51.501476, lon: 0.140634}
 
-	var keep vptree.Keeper
+		var keep vptree.Keeper
 
-	// // Find all stations within 0.75 of the residence.
-	keep = vptree.NewDistKeeper(0.25)
-	t.NearestSet(keep, q)
+		// // Find all stations within 0.75 of the residence.
+		keep = vptree.NewDistKeeper(0.25)
+		t.NearestSet(keep, q)
 
-	fmt.Println(`Stations within 750 m of 51.501476N 0.140634W.`)
-	for _, c := range keep.(*vptree.DistKeeper).Heap {
-		p := c.Comparable.(place)
-		fmt.Printf("%s: %0.3f km\n", p.name, p.Distance(q))
+		if len(keep.(*vptree.DistKeeper).Heap) == 1 {
+			continue
+		}
+
+		if index%50000 == 0 {
+			fmt.Println(index)
+		}
+		// fmt.Println(fmt.Sprintf("%f %f", q.lat, q.lon))
+		// for _, c := range keep.(*vptree.DistKeeper).Heap {
+		// 	p := c.Comparable.(place)
+		// 	fmt.Printf("%s: %0.3f km\n", p.name, p.Distance(q))
+		// }
+		// fmt.Println()
 	}
-	fmt.Println()
-
+	fmt.Println("complete")
 	// Find the five closest stations to the residence.
 	// keep = vptree.NewNKeeper(5)
 	// t.NearestSet(keep, q)
@@ -57,31 +62,7 @@ func main() {
 	// 	p := c.Comparable.(place)
 	// 	fmt.Printf("%s: %0.3f km\n", p.name, p.Distance(q))
 	// }
-}
-
-// stations is a list of railways stations.
-// var stations = []vptree.Comparable{
-// 	place{name: "Bond Street", lat: 51.5142, lon: -0.1494},
-// 	place{name: "Charing Cross", lat: 51.508, lon: -0.1247},
-// 	place{name: "Covent Garden", lat: 51.5129, lon: -0.1243},
-// 	place{name: "Embankment", lat: 51.5074, lon: -0.1223},
-// 	place{name: "Green Park", lat: 51.5067, lon: -0.1428},
-// 	place{name: "Hyde Park Corner", lat: 51.5027, lon: -0.1527},
-// 	place{name: "Leicester Square", lat: 51.5113, lon: -0.1281},
-// 	place{name: "Marble Arch", lat: 51.5136, lon: -0.1586},
-// 	place{name: "Oxford Circus", lat: 51.515, lon: -0.1415},
-// 	place{name: "Picadilly Circus", lat: 51.5098, lon: -0.1342},
-// 	place{name: "Pimlico", lat: 51.4893, lon: -0.1334},
-// 	place{name: "Sloane Square", lat: 51.4924, lon: -0.1565},
-// 	place{name: "South Kensington", lat: 51.4941, lon: -0.1738},
-// 	place{name: "St. James's Park", lat: 51.4994, lon: -0.1335},
-// 	place{name: "Temple", lat: 51.5111, lon: -0.1141},
-// 	place{name: "Tottenham Court Road", lat: 51.5165, lon: -0.131},
-// 	place{name: "Vauxhall", lat: 51.4861, lon: -0.1253},
-// 	place{name: "Victoria", lat: 51.4965, lon: -0.1447},
-// 	place{name: "Waterloo", lat: 51.5036, lon: -0.1143},
-// 	place{name: "Westminster", lat: 51.501, lon: -0.1254},
-// }
+} 
 
 // place is a vptree.Comparable implementations.
 type place struct {
