@@ -79,6 +79,38 @@ func rawTerrain() [][]float64 {
 	return terrain
 }
 
+
+func GenerateObjects(tag string) []Coord_label {
+	filePath, _ := filepath.Abs("../../simulation/terrain/temp/" + tag + "_coordinates.csv")
+	f, _ := os.Open(filePath)
+
+	objects := []Coord_label{} // list of geo coordinates
+	r := csv.NewReader(f)
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			panic(err)
+		}
+		
+		Lat, _ := strconv.ParseFloat(record[0], 64)
+		Lon, _ := strconv.ParseFloat(record[1], 64)
+		Label := record[2]
+
+		var line Coord_label
+		line.Coord.Lat = Lat
+		line.Coord.Lon = Lon
+		line.Label = Label 
+
+		objects = append(objects, line)
+	}
+
+	return objects
+}
+
+
 func genDimensions(p1 shared.Coord, p2 shared.Coord) (float64, float64) {
 	x1, y1, _, _, _ := UTM.FromLatLon(p1.Lat, p1.Lon, true)
 	x2, y2, _, _, _ := UTM.FromLatLon(p2.Lat, p2.Lon, true)
