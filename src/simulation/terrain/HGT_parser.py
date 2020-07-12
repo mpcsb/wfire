@@ -9,7 +9,7 @@ from gmalthgtparser import HgtParser
 
 try: 
     parser = argparse.ArgumentParser() 
-    parser.add_argument('-wdir', type=str, default=r'/home/miguel/Documents/projects/Wildfire', help="working dir")
+    parser.add_argument('-wdir', type=str, default=r'/home/miguel/Documents/projects/Wildfire/elevation_files', help="working dir")
     parser.add_argument('lat1', type=float, help="latitude1 for HGT file")
     parser.add_argument('lon1', type=float, help="longitude1 for HGT file")
     parser.add_argument('lat2', type=float, help="latitude2 for HGT file")
@@ -77,10 +77,10 @@ def generate_topology(p1, p2, n_points=100):
     lat = floor(p1[0])
     lon = floor(p1[1])
         
-    filename = filename_gen(lat, lon)
-    path = filename[:3] + '/' + filename
+    filename = filename_gen(lat, lon) 
+    path = os.path.join(filename[:3], filename)
     decompressed_file = filename.replace('.gz', '')
-     
+
     content = gzip.open(path).read()
         
     f = open(decompressed_file, 'wb')

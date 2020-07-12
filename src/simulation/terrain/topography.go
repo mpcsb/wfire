@@ -27,7 +27,9 @@ type Terrain struct {
 
 func CallPythonScripts(p1, p2 shared.Coord, task string) { 
 
-	python_exec := "../../../bin/python3.8" //to py venv WRONG
+	// python_exec := "../../../bin/python3.8" //to py venv WRONG
+	// python_exec := "/usr/bin/python3.8"
+	python_exec := "/home/miguel/anaconda3/bin/python3.7"
 	filePath := ""
 
 	if task == "altitude"{

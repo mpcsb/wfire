@@ -12,6 +12,7 @@ func main() {
 	p1 := shared.Coord{Lat: 38.123, Lon: 12.755, Alt: 0.0}
 	p2 := shared.Coord{Lat: 38.245, Lon: 12.889, Alt: 0.0}
 
+	fmt.Println(p1.Lat, p2.Lon)
 	t := terrain.GenerateTerrain(p1, p2)
 	fmt.Println(t.Length, t.Width)
 
