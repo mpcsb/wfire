@@ -14,21 +14,30 @@ import (
 	"github.com/im7mortal/UTM"
 )
 
-// type Coord struct {
-// 	Lat, Lon, Alt float64
-// }
+type Coord_label struct{
+	coord shared.Coord // lat, lon, alt
+	label string // type of structure in terrain: origin openstreet maps
+}
 
 type Terrain struct {
-	Coords []shared.Coord
+	Coord_Type []Coord_label
 	Width  float64
 	Length float64
 }
 
-func ExtractCoordinates(p1 shared.Coord, p2 shared.Coord) {
-	fmt.Println("Extracting coordinates")
+func CallPythonScripts(p1, p2 shared.Coord, task string) { 
 
-	python_exec := "/home/miguel/Documents/projects/Wildfire/bin/python3.8"
-	filePath, _ := filepath.Abs("../../simulation/terrain/HGT_parser.py")
+	python_exec := "../../../bin/python3.8" //to py venv WRONG
+	filePath := ""
+
+	if task == "altitude"{
+		filePath, _ = filepath.Abs("../../simulation/terrain/HGT_parser.py") //relative to cmd folder
+	}
+
+	if task == "structures"{
+		filePath, _ = filepath.Abs("../../simulation/terrain/generate_objects.py") //relative to cmd folder
+	}
+
 	cmd := exec.Command(python_exec, filePath,
 		fmt.Sprintf("%f", p1.Lat),
 		fmt.Sprintf("%f", p1.Lon),
@@ -41,6 +50,7 @@ func ExtractCoordinates(p1 shared.Coord, p2 shared.Coord) {
 	}
 	fmt.Println(string(out))
 }
+
 
 func rawTerrain() [][]float64 {
 	filePath, _ := filepath.Abs("../../simulation/terrain/temp/coords.csv")
@@ -74,14 +84,23 @@ func genDimensions(p1 shared.Coord, p2 shared.Coord) (float64, float64) {
 	return x2 - x1, y2 - y1
 }
 
-func GenerateTerrain(p1 shared.Coord, p2 shared.Coord) Terrain {
-	ExtractCoordinates(p1, p2)
+
+func GenerateTerrain(p1, p2 shared.Coord) Terrain {
+	CallPythonScripts(p1, p2, "altitude")
 	coord_lst := rawTerrain()
 
 	t := Terrain{}
+	
 	for _, v := range coord_lst {
-		t.Coords = append(t.Coords, shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]})
+		l := "undetermined" // TODO get label from coord 2 label map
+		t.Coord_Type = append(t.Coord_Type, 
+			Coord_label{shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]}, l})
 	}
+
 	t.Width, t.Length = genDimensions(p1, p2)
+	
+	CallPythonScripts(p1, p2, "structures")
 	return t
 }
+
+ 

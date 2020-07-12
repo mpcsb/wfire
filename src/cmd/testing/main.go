@@ -17,8 +17,7 @@ func main() {
 
 	r := rand.New(rand.NewSource(99))
 	u := 1
-	for u < 10 {
-		w
+	for u < 10 { 
 		u += 1
 		fmt.Println(r.Float64())
 	}

@@ -23,58 +23,41 @@ lon1 = args.lon1
 lat2 = args.lat2
 lon2 = args.lon2
 # print(lat1,lat2, lon1, lon2)
- 
-api = overpy.Overpass()
-
-q = f"""
-    way({lat1}, {lon1}, {lat2}, {lon2}) ["highway"];
-    (._;>;);
-    out body;
-    """ 
-result = api.query(q) 
-
-street_lst = list()
-for way in result.ways: 
-    for node in way.nodes:
-        street_lst.append((float(node.lat), float(node.lon))) 
-  
-with open(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/street_coordinates.csv', "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerows(street_lst)
 
 
-api = overpy.Overpass()
-q = f"""
-    way({lat1}, {lon1}, {lat2}, {lon2}) ["landuse"];
-    (._;>;);
-    out body;
-    """ 
-result = api.query(q) 
 
-natural_lst = list()
-for way in result.ways: 
-    for node in way.nodes:
-        natural_lst.append((float(node.lat), float(node.lon))) 
-  
-with open(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/landuse_coordinates.csv', "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerows(natural_lst)
+def extract_elements(lat1, lat2, lon1, lon2, tag):
+    api = overpy.Overpass()
 
+    q = f"""
+        way({lat1}, {lon1}, {lat2}, {lon2}) ["{tag}"];
+        (._;>;);
+        out body;
+        """ 
+    result = api.query(q) 
 
-api = overpy.Overpass()
-q = f"""
-    way({lat1}, {lon1}, {lat2}, {lon2}) ["natural"];
-    (._;>;);
-    out body;
-    """ 
-result = api.query(q) 
+    lst = list()
+    for way in result.ways: #TODO validate on IDE to interact with result if .ways is a valid attribute
+        for node in way.nodes:
+            lst.append((float(node.lat), float(node.lon))) 
+    
+    with open(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/' +  tag + r'_coordinates.csv', "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(lst)
+    print(tag, 'extracted')
 
-natural_lst = list()
-for way in result.ways: 
-    for node in way.nodes:
-        natural_lst.append((float(node.lat), float(node.lon))) 
-  
-with open(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/natural_coordinates.csv', "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerows(natural_lst)
- 
+if False:
+    extract_elements(lat1, lat2, lon1, lon2, 'highway')
+    extract_elements(lat1, lat2, lon1, lon2, 'landuse') 
+    extract_elements(lat1, lat2, lon1, lon2, 'natural')
+    extract_elements(lat1, lat2, lon1, lon2, 'water')
+    extract_elements(lat1, lat2, lon1, lon2, 'railway')
+else:
+    extract_elements(lat1, lat2, lon1, lon2, 'building')
+
+# duds
+# extract_elements(lat1, lat2, lon1, lon2, 'landcover=trees')
+# extract_elements(lat1, lat2, lon1, lon2, 'wood')
+# extract_elements(lat1, lat2, lon1, lon2, 'trees')
+# extract_elements(lat1, lat2, lon1, lon2, 'landuse=forest')
+# extract_elements(lat1, lat2, lon1, lon2, 'natural=wood')
