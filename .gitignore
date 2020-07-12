@@ -13,12 +13,8 @@
 
 elevation_data/
 
-wfire/pkg/
+pkg/
 
-wfire/pkg/sumdb/
+bin/
 
-wfire/src/bin/
 
-wfire/src/cmd/run.exe
-
-wfire/bin/

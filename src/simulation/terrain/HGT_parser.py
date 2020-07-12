@@ -3,13 +3,13 @@ from math import floor
 import gzip
 import argparse
 import csv 
-# import numpy as np
+
 from tqdm import tqdm
 from gmalthgtparser import HgtParser   
 
 try: 
     parser = argparse.ArgumentParser() 
-    parser.add_argument('-wdir', type=str, default=r'/home/miguel/Documents/projects', help="working dir")
+    parser.add_argument('-wdir', type=str, default=r'/home/miguel/Documents/projects/Wildfire', help="working dir")
     parser.add_argument('lat1', type=float, help="latitude1 for HGT file")
     parser.add_argument('lon1', type=float, help="longitude1 for HGT file")
     parser.add_argument('lat2', type=float, help="latitude2 for HGT file")
@@ -31,6 +31,7 @@ p2 = (lat2, lon2)
 
 def linspace(lower, upper, num):  
     return [lower + x*(upper-lower)/num for x in range(num)]
+
 
 def filename_gen(lat, lon):
     ''' receives coordinates used to select hgt file'''
@@ -101,6 +102,6 @@ def generate_topology(p1, p2, n_points=100):
 
 terrain = generate_topology(p1, p2, n_points=80)
 
-with open(r'C:\Users\Miguel\Documents\repos\wfire\wfire\src\simulation\terrain\temp\coords.csv', "w", newline="") as f:
+with open(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/coords.csv', "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerows(terrain)
