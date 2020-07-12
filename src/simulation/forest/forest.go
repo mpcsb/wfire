@@ -21,10 +21,13 @@ func ForestGeneration(p1 shared.Coord, p2 shared.Coord) forest {
 	treeDimensions := loadTreeDimensions()
 
 	var f forest
-	for i := range terrain_points.Coords {
-		coordinate := terrain_points.Coords[i]
-		t := fuel.CreateTree(1, coordinate, "pine", treeDimensions)
-		f.tree_lst = append(f.tree_lst, t)
+	for i := range terrain_points.Coord_Type {
+		coord_type := terrain_points.Coord_Type[i]
+		label := coord_type.Label
+		if label == "tree"{
+			t := fuel.CreateTree(1, coord_type.Coord, "pine", treeDimensions)
+			f.tree_lst = append(f.tree_lst, t)
+		}
 	}
 	return f
 }

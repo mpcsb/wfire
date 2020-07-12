@@ -15,8 +15,8 @@ import (
 )
 
 type Coord_label struct{
-	coord shared.Coord // lat, lon, alt
-	label string // type of structure in terrain: origin openstreet maps
+	Coord shared.Coord // lat, lon, alt
+	Label string // type of structure in terrain: origin openstreet maps
 }
 
 type Terrain struct {
