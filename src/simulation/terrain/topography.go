@@ -51,8 +51,7 @@ func CallPythonScripts(p1, p2 shared.Coord, task string) {
 		fmt.Println(err)
 	}
 	fmt.Println(string(out))
-}
-
+} 
 
 func rawTerrain() [][]float64 {
 	filePath, _ := filepath.Abs("../../simulation/terrain/temp/coords.csv")
@@ -91,8 +90,7 @@ func GenerateTerrain(p1, p2 shared.Coord) Terrain {
 	CallPythonScripts(p1, p2, "altitude")
 	coord_lst := rawTerrain()
 
-	t := Terrain{}
-	
+	t := Terrain{} 
 	for _, v := range coord_lst {
 		l := "undetermined" // TODO get label from coord 2 label map
 		t.Coord_Type = append(t.Coord_Type, 
