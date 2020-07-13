@@ -73,20 +73,17 @@ def generate_topology(p1, p2, n_points=100):
     np_lon = linspace(p1[1], p2[1], num=n_points )
     
     coords_lat_lon = [(lat, lon) for lat in list(np_lat) for lon in list(np_lon)]
-    # https://www.quora.com/How-many-meters-make-up-a-degree-of-longitude-latitude-on-Earth#:~:text=It%20means%20that%2C%20where%20I,that%20of%20latitude%3B%200.926%20meters.&text=flat%2C%20...-,As%20the%20Earth%20is%20not%20flat%20no%20such%20conversion%20is,everywhere%20else%2C%20ignoring%20elevation).
     lat = floor(p1[0])
     lon = floor(p1[1])
         
     filename = filename_gen(lat, lon) 
     path = os.path.join(filename[:3], filename)
-    decompressed_file = filename.replace('.gz', '')
-
+    decompressed_file = filename.replace('.gz', '') 
     content = gzip.open(path).read()
         
     f = open(decompressed_file, 'wb')
     f.write(content)
-    f.close()
-    
+    f.close() 
      
     terrain = list()
     with HgtParser(decompressed_file) as parser:
@@ -100,7 +97,7 @@ def generate_topology(p1, p2, n_points=100):
     return terrain
 
 
-terrain = generate_topology(p1, p2, n_points=80)
+terrain = generate_topology(p1, p2, n_points=100)
 
 with open(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/coords.csv', "w", newline="") as f:
     writer = csv.writer(f)

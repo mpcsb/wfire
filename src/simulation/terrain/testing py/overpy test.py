@@ -6,7 +6,7 @@ import overpy
 
  
 lat1, lat2, lon1, lon2 = 38.718159, 38.78348, -9.481779 , -9.289
-tag = 'landuse'
+tag = 'highway'
 
 api = overpy.Overpass()
 

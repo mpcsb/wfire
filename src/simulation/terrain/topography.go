@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"simulation/shared"
+	"gonum.org/v1/gonum/spatial/vptree"
 
 	"github.com/im7mortal/UTM"
 )
@@ -18,6 +19,12 @@ type Coord_label struct{
 	Coord shared.Coord // lat, lon, alt
 	Label string // type of structure in terrain: origin openstreet maps
 }
+
+type Coord_label2 struct {
+	Lat, Lon float64
+	Label     string
+}
+
 
 type Terrain struct {
 	Coord_Type []Coord_label
@@ -55,6 +62,7 @@ func CallPythonScripts(p1, p2 shared.Coord, task string) {
 
 func rawTerrain() [][]float64 {
 	filePath, _ := filepath.Abs("../../simulation/terrain/temp/coords.csv")
+	fmt.Println("gen terrain",filePath)
 	f, _ := os.Open(filePath)
 
 	terrain := [][]float64{} // list of geo coordinates
@@ -80,11 +88,12 @@ func rawTerrain() [][]float64 {
 }
 
 
-func GenerateObjects(tag string) []Coord_label {
+func GenerateObjects(tag string) []Coord_label2 {
 	filePath, _ := filepath.Abs("../../simulation/terrain/temp/" + tag + "_coordinates.csv")
+	fmt.Println("gen objects",filePath)
 	f, _ := os.Open(filePath)
 
-	objects := []Coord_label{} // list of geo coordinates
+	objects := []Coord_label2{} // list of geo coordinates
 	r := csv.NewReader(f)
 	for {
 		record, err := r.Read()
@@ -99,14 +108,13 @@ func GenerateObjects(tag string) []Coord_label {
 		Lon, _ := strconv.ParseFloat(record[1], 64)
 		Label := record[2]
 
-		var line Coord_label
-		line.Coord.Lat = Lat
-		line.Coord.Lon = Lon
+		var line Coord_label2
+		line.Lat = Lat
+		line.Lon = Lon
 		line.Label = Label 
 
 		objects = append(objects, line)
-	}
-
+	} 
 	return objects
 }
 
@@ -117,22 +125,51 @@ func genDimensions(p1 shared.Coord, p2 shared.Coord) (float64, float64) {
 	return x2 - x1, y2 - y1
 }
 
+func (p Coord_label2) Distance(c vptree.Comparable) float64 {
+	q := c.(Coord_label2)
+	return shared.Haversine(p.Lat, p.Lon, q.Lat, q.Lon)
+}
 
 func GenerateTerrain(p1, p2 shared.Coord) Terrain {
-	CallPythonScripts(p1, p2, "altitude")
-	coord_lst := rawTerrain()
 
-	t := Terrain{} 
+	CallPythonScripts(p1, p2, "altitude")
+	CallPythonScripts(p1, p2, "structures")
+
+	coord_lst := rawTerrain() 
+	landuse := GenerateObjects("landuse")
+	fmt.Println(landuse[:10])
+
+	var landuse_coords = []vptree.Comparable{} //Coord_label2{38.7928606, -9.4202621, "forest"}}
+	for i, _ := range landuse {
+		labelled_coord := Coord_label2{Lat: landuse[i].Lat, Lon:landuse[i].Lon, Label: landuse[i].Label}
+		landuse_coords = append(landuse_coords, labelled_coord)
+	}
+
+	t, err := vptree.New(landuse_coords, 0, nil)
+	fmt.Println(err)
+	
+	var ter Terrain
 	for _, v := range coord_lst {
+		
+		var keep vptree.Keeper
+		keep = vptree.NewNKeeper(1) // 8 adjacent points in lattice
+		tree := Coord_label2{Lat:v[0], Lon:v[1], Label:""} 
+		t.NearestSet(keep, tree)
+
+		for _, c := range keep.(*vptree.NKeeper).Heap {
+			p := c.Comparable.(Coord_label2)
+			fmt.Println(p.Label, p.Distance(tree), tree.Lat, tree.Lon, v[0], v[1], keep)
+		}
+		fmt.Println()
 		l := "undetermined" // TODO get label from coord 2 label map
-		t.Coord_Type = append(t.Coord_Type, 
+		ter.Coord_Type = append(ter.Coord_Type, 
 			Coord_label{shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]}, l})
 	}
 
-	t.Width, t.Length = genDimensions(p1, p2)
-	
-	CallPythonScripts(p1, p2, "structures")
-	return t
+
+
+	ter.Width, ter.Length = genDimensions(p1, p2)
+	return ter
 }
 
  
