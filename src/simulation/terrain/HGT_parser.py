@@ -4,8 +4,10 @@ import gzip
 import argparse
 import csv 
 
+import numpy as np 
 from tqdm import tqdm
 from gmalthgtparser import HgtParser   
+import richdem as rd
 
 try: 
     parser = argparse.ArgumentParser() 
@@ -14,21 +16,22 @@ try:
     parser.add_argument('lon1', type=float, help="longitude1 for HGT file")
     parser.add_argument('lat2', type=float, help="latitude2 for HGT file")
     parser.add_argument('lon2', type=float, help="longitude2 for HGT file")
-    # args = parser.parse_args()
-    args, unknown = parser.parse_known_args()
+    parser.add_argument('sample_size', type=int, help="squared root of samples")
+    args = parser.parse_args() 
 
-    os.chdir(args.wdir) 
+    os.chdir(args.wdir)  
 except Exception as e:
     print(e)
+
 lat1 = args.lat1
 lon1 = args.lon1
 lat2 = args.lat2
 lon2 = args.lon2
+sample_size = args.sample_size
 
 p1 = (lat1, lon1)
 p2 = (lat2, lon2)
-
-
+ 
 def linspace(lower, upper, num):  
     return [lower + x*(upper-lower)/num for x in range(num)]
 
@@ -68,7 +71,7 @@ def filename_gen(lat, lon):
     return  fname
 
 
-def generate_topology(p1, p2, n_points=100):  
+def get_height(p1, p2, n_points=100):  
     np_lat = linspace(p1[0], p2[0], num=n_points )
     np_lon = linspace(p1[1], p2[1], num=n_points )
     
@@ -95,10 +98,16 @@ def generate_topology(p1, p2, n_points=100):
                 pbar.update(1)
     os.remove(decompressed_file) 
     return terrain
+ 
 
+terrain = get_height(p1, p2, n_points=sample_size)
+terrain_np = np.array(terrain)
+rd_frame = rd.rdarray(np.flip(terrain_np[:,2].reshape(sample_size,sample_size), 0), no_data=-9999)
+ 
+slope = rd.TerrainAttribute(rd_frame, attrib='slope_riserun') 
+aspect = rd.TerrainAttribute(rd_frame, attrib='aspect') 
 
-terrain = generate_topology(p1, p2, n_points=100)
-
-with open(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/coords.csv', "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerows(terrain)
+full_terrain = np.column_stack((terrain_np, 
+                                slope.reshape(sample_size**2), 
+                                aspect.reshape(sample_size**2))) 
+np.savetxt(r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation/terrain/temp/coords.csv', full_terrain, delimiter=',') 

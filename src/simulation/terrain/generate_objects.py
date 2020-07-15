@@ -11,19 +11,22 @@ try:
     parser.add_argument('lon1', type=float, help="longitude1 for HGT file")
     parser.add_argument('lat2', type=float, help="latitude2 for HGT file")
     parser.add_argument('lon2', type=float, help="longitude2 for HGT file")
-    # args = parser.parse_args()
-    args, unknown = parser.parse_known_args()
+    parser.add_argument('sample_size', type=int, help="squared root of samples")
+    args = parser.parse_args() 
 
-    os.chdir(args.wdir) 
+    os.chdir(args.wdir)  
 except Exception as e:
     print(e)
+
 lat1 = args.lat1
 lon1 = args.lon1
 lat2 = args.lat2
 lon2 = args.lon2
+sample_size = args.sample_size
 
 p1 = (lat1, lon1)
 p2 = (lat2, lon2)
+
 
 def extract_elements(lat1, lat2, lon1, lon2, tag):
     api = overpy.Overpass()

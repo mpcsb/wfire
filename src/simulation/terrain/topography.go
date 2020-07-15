@@ -27,7 +27,8 @@ type Terrain struct {
 	Length float64
 }
 
-func CallPythonScripts(p1, p2 shared.Coord, task string) { 
+
+func CallPythonScripts(p1, p2 shared.Coord, sample_size int, task string) { 
 
 	// python_exec := "../../../bin/python3.8" //to py venv WRONG
 	// python_exec := "/usr/bin/python3.8"
@@ -46,7 +47,8 @@ func CallPythonScripts(p1, p2 shared.Coord, task string) {
 		fmt.Sprintf("%f", p1.Lat),
 		fmt.Sprintf("%f", p1.Lon),
 		fmt.Sprintf("%f", p2.Lat),
-		fmt.Sprintf("%f", p2.Lon))
+		fmt.Sprintf("%f", p2.Lon),
+		fmt.Sprintf("%d", sample_size))
 
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -57,8 +59,7 @@ func CallPythonScripts(p1, p2 shared.Coord, task string) {
 
 
 func rawTerrain() [][]float64 {
-	filePath, _ := filepath.Abs("../../simulation/terrain/temp/coords.csv")
-	fmt.Println("gen terrain",filePath)
+	filePath, _ := filepath.Abs("../../simulation/terrain/temp/coords.csv") 
 	f, _ := os.Open(filePath)
 
 	terrain := [][]float64{} // list of geo coordinates
@@ -72,7 +73,7 @@ func rawTerrain() [][]float64 {
 			panic(err)
 		}
 
-		floatRecord := make([]float64, 3)
+		floatRecord := make([]float64, 5)
 		for i, s := range record {
 			if v, err := strconv.ParseFloat(s, 64); err == nil {
 				floatRecord[i] = v
@@ -90,11 +91,10 @@ func genDimensions(p1 shared.Coord, p2 shared.Coord) (float64, float64) {
 	return x2 - x1, y2 - y1
 }
 
+ 
+func GenerateTerrain(p1, p2 shared.Coord, sample_size int) Terrain {
 
-
-func GenerateTerrain(p1, p2 shared.Coord) Terrain {
-
-	CallPythonScripts(p1, p2, "altitude") 
+	CallPythonScripts(p1, p2, sample_size, "altitude") 
 
 	coord_lst := rawTerrain() 
 	
@@ -102,7 +102,7 @@ func GenerateTerrain(p1, p2 shared.Coord) Terrain {
 	for _, v := range coord_lst {  
 		t.Coord_Type = append(t.Coord_Type, 
 			Coord_label{shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]}, ""})// TODO get label from coord 2 label map
-	} 
-	t.Width, t.Length = genDimensions(p1, p2)
+	}  
+	t.Width, t.Length = genDimensions(p1, p2) 
 	return t
 } 
