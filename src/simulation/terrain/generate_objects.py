@@ -6,7 +6,7 @@ import overpy
 
 try: 
     parser = argparse.ArgumentParser() 
-    parser.add_argument('-wdir', type=str, default=r'/home/miguel/Documents/projects/Wildfire/src/simulation', help="working dir")
+    parser.add_argument('-wdir', type=str, default=r'/home/miguel/Documents/projects/Wildfire/wfire/src/simulation', help="working dir")
     parser.add_argument('lat1', type=float, help="latitude1 for HGT file")
     parser.add_argument('lon1', type=float, help="longitude1 for HGT file")
     parser.add_argument('lat2', type=float, help="latitude2 for HGT file")
@@ -39,7 +39,7 @@ def extract_elements(lat1, lat2, lon1, lon2, tag):
     result = api.query(q) 
 
     lst = list()
-    for way in result.ways: #TODO validate on IDE to interact with result if .ways is a valid attribute
+    for way in result.ways:  
         
         for node in way.nodes:
             try: 

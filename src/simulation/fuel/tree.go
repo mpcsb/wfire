@@ -35,12 +35,12 @@ type Tree_data struct {
 func CreateTree(id int, p shared.Coord, species string, tree_db map[string][5]float64) Tree_data {
 	t := Tree_data{ID: id}
 	t.species = species
-	initStatic(t, tree_db)
-	initBiomass(t)
+	t.InitStatic(tree_db)
+	t.InitBiomass()
 	return t
 }
 
-func initStatic(t Tree_data, tree_db map[string][5]float64) {
+func (t Tree_data) InitStatic(tree_db map[string][5]float64) {
 	dims := tree_db[t.species]
 
 	t.static.height = dims[0]
@@ -50,11 +50,11 @@ func initStatic(t Tree_data, tree_db map[string][5]float64) {
 	t.static.flammability = dims[4]
 }
 
-func initBiomass(t Tree_data) {
+func (t Tree_data) InitBiomass() {
 	t.dynamic.biomass = t.static.height * t.static.diameter_breast_height * t.static.crown_radius
 }
 
-func updateMoisture(t Tree_data, temperature float64) {
+func (t Tree_data) UpdateMoisture(temperature float64) {
 	temperature_diff := temperature - 25.0 // 25ºC to be defined
 	diff := 0.0
 	if temperature_diff > 0 {
@@ -65,7 +65,8 @@ func updateMoisture(t Tree_data, temperature float64) {
 	t.dynamic.moisture = t.dynamic.moisture - diff
 }
 
-type tree interface {
-	CreateTree()
-	updateMoisture()
-}
+
+// type tree interface {
+// 	CreateTree()
+// 	UpdateMoisture()
+// }

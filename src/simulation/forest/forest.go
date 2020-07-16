@@ -17,7 +17,7 @@ func loadTreeDimensions() map[string][5]float64 {
 }
 
 func ForestGeneration(p1 shared.Coord, p2 shared.Coord) forest {
-	terrain_points := terrain.GenerateTerrain(p1, p2)
+	terrain_points := terrain.GenerateTerrain(p1, p2, 200)
 	treeDimensions := loadTreeDimensions()
 
 	var f forest
