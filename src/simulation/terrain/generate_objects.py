@@ -40,7 +40,6 @@ def extract_elements(lat1, lat2, lon1, lon2, tag):
 
     lst = list()
     for way in result.ways:  
-        
         for node in way.nodes:
             try: 
                 lst.append((float(node.lat), float(node.lon), way.tags[tag])) 

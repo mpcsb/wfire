@@ -7,9 +7,9 @@ import(
 	"os" 
 	"path/filepath"
 	"strconv"
-	"simulation/shared"
+	// "simulation/shared"
 
-	"gonum.org/v1/gonum/spatial/vptree"
+	// "gonum.org/v1/gonum/spatial/vptree"
 )
 
 type Coord_label2 struct {
@@ -18,13 +18,13 @@ type Coord_label2 struct {
 }
 
 
-func (p Coord_label2) Distance(c vptree.Comparable) float64 {
-	q := c.(Coord_label2)
-	return shared.Haversine(p.Lat, p.Lon, q.Lat, q.Lon)
-}
+// func (p Coord_label2) Distance(c vptree.Comparable) float64 {
+// 	q := c.(Coord_label2)
+// 	return shared.Haversine(p.Lat, p.Lon, q.Lat, q.Lon)
+// }
 
 
-func rawObjects(tag string) []Coord_label2 {
+func rawObjects(tag string) ([]Coord_label2 , error){
 	filePath, _ := filepath.Abs("../../simulation/terrain/temp/" + tag + "_coordinates.csv")
 
 	f, _ := os.Open(filePath)
@@ -51,53 +51,78 @@ func rawObjects(tag string) []Coord_label2 {
 
 		objects = append(objects, line)
 	} 
-	return objects
+	if len(objects) == 0{
+		return objects, fmt.Errorf(tag + ": No objects in terrain")
+	} 
+	return objects, nil
 }
 
 
-func (ter Terrain) GenerateObjets(dist float64, tag string) (err error){  
-
-	tag_points := rawObjects(tag) 
-	var coordinates_tag = []vptree.Comparable{} 
-
-	if len(tag_points) == 0{
-		return fmt.Errorf(tag + ": No objects in terrain")
-	}	
-
-	for i, _ := range tag_points {
-		labelled_coord := Coord_label2{Lat: tag_points[i].Lat, Lon:tag_points[i].Lon, Label: tag_points[i].Label}
-		coordinates_tag = append(coordinates_tag, labelled_coord)
+func ObjectCoordinates()[]Coord_label2{
+	var object_lst []Coord_label2
+	tags := []string{"structures", "natural", "water", "landuse", "building", "highway", "railway"}
+	for _, tag := range tags{
+		objects, err := rawObjects(tag)
+		if err != nil{
+			continue
+		}
+		for i := range(objects){
+			object_lst = append(object_lst, objects[i])
+		} 
 	}
+	return object_lst
+}
 
-	t, _ := vptree.New(coordinates_tag, 1, nil)
+// func ProcessTaggedCoords(){
+// 	objCoords := ObjectCoordinates()
+// 	curatedObjects := []Coord_label2
+
+// 	for _, v := range objCoords{
+// 		lat, lon, tag := v.Lat, v.Lon, v.Label
+// 	}
+
+// }
+
+// func (ter Terrain) GenerateObjets(dist float64, tag string) (err error){  
+
+// 	tag_points := rawObjects(tag) 
+// 	var coordinates_tag = []vptree.Comparable{} 
+
+// 	if len(tag_points) == 0{
+// 		return fmt.Errorf(tag + ": No objects in terrain")
+// 	} 
+
+// 	for i, _ := range tag_points {
+// 		labelled_coord := Coord_label2{Lat: tag_points[i].Lat, Lon:tag_points[i].Lon, Label: tag_points[i].Label}
+// 		coordinates_tag = append(coordinates_tag, labelled_coord)
+// 	}
+
+// 	t, _ := vptree.New(coordinates_tag, 1, nil)
  
-	coord_lst := ter.Coord_Type
+// 	coord_lst := ter.Coord_Type
 
-	for i, v := range coord_lst {  // sample size 
+// 	for i, v := range coord_lst {  // sample size 
 		
-		v_coord := v.Coord
-		var keep vptree.Keeper
-		keep = vptree.NewNKeeper(1) // 8 adjacent points in lattice
-		tree := Coord_label2{Lat:v_coord.Lat, Lon:v_coord.Lon, Label:""} 
-		t.NearestSet(keep, tree)
+// 		v_coord := v.Coord
+// 		var keep vptree.Keeper
+// 		keep = vptree.NewNKeeper(1) // 8 adjacent points in lattice
+// 		tree := Coord_label2{Lat:v_coord.Lat, Lon:v_coord.Lon, Label:""} 
+// 		t.NearestSet(keep, tree)
 
-		for _, c := range keep.(*vptree.NKeeper).Heap {
-			p := c.Comparable.(Coord_label2) 
-			if p.Distance(tree) < dist{
-				coord_lst[i].Label = p.Label
-				// fmt.Println(p.Label, p.Distance(tree))
-			}
-		}  
-	}
+// 		for _, c := range keep.(*vptree.NKeeper).Heap {
+// 			p := c.Comparable.(Coord_label2) 
+// 			if p.Distance(tree) < dist{
+// 				coord_lst[i].Label = p.Label
+// 				// fmt.Println(p.Label, p.Distance(tree))
+// 			}
+// 		}  
+// 	}
 
-	return 
-}
+// 	return 
+// }
 
 
-func adjacent_points(p shared.Coord){
-	adjacent_coords := [][2]int{{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{-1,0},{-1,1}}
-	fmt.Println(adjacent_coords)
-}
+
 
 // def adjacent_points(la, lo, h):
 //     i_lat = latitudes.index(la)

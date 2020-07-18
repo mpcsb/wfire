@@ -25,6 +25,7 @@ type Terrain struct {
 	Coord_Type []Coord_label
 	Width  float64
 	Length float64
+	Coord2Alt map[shared.Coord2]float64
 }
 
 
@@ -85,17 +86,27 @@ func rawTerrain() [][]float64 {
 }
 
 
-func genDimensions(p1 shared.Coord, p2 shared.Coord) (float64, float64) {
+func (t Terrain) genDimensions(p1 shared.Coord, p2 shared.Coord) () {
+	// can this be replaced with shared.Haversine?
 	x1, y1, _, _, _ := UTM.FromLatLon(p1.Lat, p1.Lon, true)
 	x2, y2, _, _, _ := UTM.FromLatLon(p2.Lat, p2.Lon, true)
-	return x2 - x1, y2 - y1
+	t.Width, t.Length = x2 - x1, y2 - y1
 }
 
- 
+
+func (t Terrain) LatLon2Alt()  {
+	coord2alt := make(map[shared.Coord2]float64, len(t.Coord_Type))
+	for i := range t.Coord_Type{
+		coord := shared.Coord2{Lat: t.Coord_Type[i].Coord.Lat, Lon: t.Coord_Type[i].Coord.Lon}
+		coord2alt[coord] = t.Coord_Type[i].Coord.Alt
+	}
+	t.Coord2Alt = coord2alt
+}
+
+
 func GenerateTerrain(p1, p2 shared.Coord, sample_size int) Terrain {
 
 	CallPythonScripts(p1, p2, sample_size, "altitude") 
-
 	coord_lst := rawTerrain() 
 	
 	var t Terrain
@@ -103,6 +114,8 @@ func GenerateTerrain(p1, p2 shared.Coord, sample_size int) Terrain {
 		t.Coord_Type = append(t.Coord_Type, 
 			Coord_label{shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]}, ""})// TODO get label from coord 2 label map
 	}  
-	t.Width, t.Length = genDimensions(p1, p2) 
+	t.genDimensions(p1, p2) 
+	t.LatLon2Alt()
+
 	return t
 } 
