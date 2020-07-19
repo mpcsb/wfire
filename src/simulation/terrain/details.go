@@ -58,7 +58,7 @@ func rawObjects(tag string) ([]Coord_label2 , error){
 }
 
 
-func ObjectCoordinates()[]Coord_label2{
+func (t Terrain) ObjectCoordinates() []Coord_label2{
 	var object_lst []Coord_label2
 	tags := []string{"structures", "natural", "water", "landuse", "building", "highway", "railway"}
 	for _, tag := range tags{
