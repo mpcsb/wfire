@@ -18,15 +18,17 @@ import (
 
 type Coord_label struct{
 	Coord shared.Coord // lat, lon, alt
-	Label string // type of structure in terrain: origin openstreet maps
+	Slope float64
+	Aspect float64 // type of structure in terrain: origin openstreet maps
 }
  
 
 type Terrain struct {
 	Coord_Type []Coord_label
-	Width  float64
-	Length float64
+	Width, Length  float64 
 	Coord2Alt map[shared.Coord2]float64
+	Coord2Slope map[shared.Coord2]float64
+	Coord2Aspect map[shared.Coord2]float64
 	SetLon []float64
 	SetLat []float64
 }
@@ -105,6 +107,26 @@ func (t Terrain) LatLon2Alt()  {
 }
 
 
+func (t Terrain) LatLon2Slope()  {
+	coord2Slope := make(map[shared.Coord2]float64, len(t.Coord_Type))
+	for i := range t.Coord_Type{
+		coord := shared.Coord2{Lat: t.Coord_Type[i].Coord.Lat, Lon: t.Coord_Type[i].Coord.Lon}
+		coord2Slope[coord] = t.Coord_Type[i].Slope
+	}
+	t.Coord2Slope = coord2Slope
+}
+
+
+func (t Terrain) LatLon2Aspect()  {
+	coord2Aspect := make(map[shared.Coord2]float64, len(t.Coord_Type))
+	for i := range t.Coord_Type{
+		coord := shared.Coord2{Lat: t.Coord_Type[i].Coord.Lat, Lon: t.Coord_Type[i].Coord.Lon}
+		coord2Aspect[coord] = t.Coord_Type[i].Aspect
+	}
+	t.Coord2Aspect= coord2Aspect
+}
+
+
 func (t Terrain) Uniques() {
 	set_lat := make(map[float64]bool)
 	set_lon := make(map[float64]bool)
@@ -160,7 +182,7 @@ func (t Terrain) Adjacent(p shared.Coord) (float64, float64, float64, float64){
 // https://en.wikipedia.org/wiki/Bilinear_interpolation
 // a linear interpolation is enough given the relative error of the SRTM measurements
 // linear vs cubic interp seems justified for 'regular' topographies
-func (t Terrain) Binterp(target shared.Coord) float64 {
+func (t Terrain) Binterp(target shared.Coord) (float64, float64, float64) {
 	x := target.Lat
 	y := target.Lon
 
@@ -168,9 +190,17 @@ func (t Terrain) Binterp(target shared.Coord) float64 {
 
 	R1 := t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y1}] + (x-x1)/(x2-x1)*(t.Coord2Alt[shared.Coord2{Lat:x2, Lon:y1}]-t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y1}])
 	R2 := t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y2}] + (x-x1)/(x2-x1)*(t.Coord2Alt[shared.Coord2{Lat:x2, Lon:y2}]-t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y2}])
+	altitude := R2 + (y-y2)/(y2-y1)*(R1-R2)
 
-	val := R2 + (y-y2)/(y2-y1)*(R1-R2)
-	return val
+	R1 = t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y1}] + (x-x1)/(x2-x1)*(t.Coord2Slope[shared.Coord2{Lat:x2, Lon:y1}]-t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y1}])
+	R2 = t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y2}] + (x-x1)/(x2-x1)*(t.Coord2Slope[shared.Coord2{Lat:x2, Lon:y2}]-t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y2}])
+	slope := R2 + (y-y2)/(y2-y1)*(R1-R2)
+
+	R1 = t.Coord2Aspect[shared.Coord2{Lat:x1, Lon:y1}] + (x-x1)/(x2-x1)*(t.Coord2Aspect[shared.Coord2{Lat:x2, Lon:y1}]-t.Coord2Aspect[shared.Coord2{Lat:x1, Lon:y1}])
+	R2 = t.Coord2Aspect[shared.Coord2{Lat:x1, Lon:y2}] + (x-x1)/(x2-x1)*(t.Coord2Aspect[shared.Coord2{Lat:x2, Lon:y2}]-t.Coord2Aspect[shared.Coord2{Lat:x1, Lon:y2}])
+	aspect := R2 + (y-y2)/(y2-y1)*(R1-R2)
+
+	return altitude, slope, aspect
 }
 
 
@@ -182,7 +212,7 @@ func GenerateTerrain(p1, p2 shared.Coord, sample_size int) Terrain {
 	var t Terrain
 	for _, v := range coord_lst {  
 		t.Coord_Type = append(t.Coord_Type, 
-			Coord_label{shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]}, ""})// TODO get label from coord 2 label map
+			Coord_label{shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]}, v[3], v[4]})  // Slope: v[3], Aspect:v[4]
 	}  
 	// t.GenDimensions(p1, p2) 
  
