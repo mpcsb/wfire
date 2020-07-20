@@ -89,8 +89,9 @@ func rawTerrain() [][]float64 {
 }
 
 
-func (t Terrain) genDimensions(p1 shared.Coord, p2 shared.Coord) () { 
-	t.Width, t.Length = shared.Haversine(p1.Lat, p2.Lon, p2.Lat, p2.Lon), shared.Haversine(p1.Lat, p1.Lon, p1.Lat, p2.Lon)
+func (t Terrain) GenDimensions(p1 shared.Coord, p2 shared.Coord){ 
+	t.Width = shared.Haversine(p1.Lat, p2.Lon, p2.Lat, p2.Lon) 
+	t.Length = shared.Haversine(p1.Lat, p1.Lon, p1.Lat, p2.Lon)
 }
 
 
@@ -172,6 +173,7 @@ func (t Terrain) Binterp(target shared.Coord) float64 {
 	return val
 }
 
+
 func GenerateTerrain(p1, p2 shared.Coord, sample_size int) Terrain {
 
 	CallPythonScripts(p1, p2, sample_size, "altitude") 
@@ -182,7 +184,11 @@ func GenerateTerrain(p1, p2 shared.Coord, sample_size int) Terrain {
 		t.Coord_Type = append(t.Coord_Type, 
 			Coord_label{shared.Coord{Lat: v[0], Lon: v[1], Alt: v[2]}, ""})// TODO get label from coord 2 label map
 	}  
-	t.genDimensions(p1, p2) 
+	// t.GenDimensions(p1, p2) 
+ 
+	t.Length = shared.Haversine(p1.Lat, p1.Lon, p1.Lat, p2.Lon)
+	t.Width = shared.Haversine(p1.Lat, p2.Lon, p2.Lat, p2.Lon)
+
 	t.LatLon2Alt()
 	t.Uniques()
 
