@@ -62,7 +62,7 @@ func Linspace(lower, upper, num float64) []float64 {
 	upper = Max(lower, upper) 
 	num_int := int(num) 
 
-	array := make([]float64, num_int)
+	var array []float64
 	for i := 1; i <= num_int; i++ {
 		array = append(array, lower + float64(i) * (upper - lower)/ float64(num_int))
 	} 
