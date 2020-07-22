@@ -90,7 +90,7 @@ func ForestGeneration(p1, p2 shared.Coord, samples int) Forest {
 func (f Forest) GetNeighbours(d float64){ 
 	fmt.Println("Finding VP")
 	// handle vp, err :=....
-	vp, _ := vptree.New(f.Tree_Coords, 100, nil)
+	vp, _ := vptree.New(f.Tree_Coords, 0, nil)
 	fmt.Println("VP found")
 	for i, q := range f.Tree_Coords {
 		
@@ -102,7 +102,7 @@ func (f Forest) GetNeighbours(d float64){
 			tree := neighbour_tree.Comparable.(TreeCoord)
 			f.Tree_lst[i].Neighbours = append(f.Tree_lst[i].Neighbours, tree.ID)
 		} 
-		if i % 10000 == 0{
+		if i % 50000 == 0{
 			fmt.Println("Neighbours", len(f.Tree_lst), i, len(f.Tree_lst[i].Neighbours),f.Tree_lst[i].Neighbours[:5])
 		}
 	}
