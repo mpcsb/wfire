@@ -55,6 +55,14 @@ func Max(a, b float64) float64 {
     return b
 }
 
+func Abs(f float64) float64{
+	if f < 0{
+		return f * -1
+	} else {
+		return f
+	}
+}
+
 
 func Linspace(lower, upper, num float64) []float64 {
  
