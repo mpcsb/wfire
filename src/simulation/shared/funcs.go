@@ -55,6 +55,14 @@ func Max(a, b float64) float64 {
     return b
 }
 
+func Abs(f float64) float64{
+	if f < 0{
+		return f * -1
+	} else {
+		return f
+	}
+}
+
 
 func Linspace(lower, upper, num float64) []float64 {
  
@@ -73,4 +81,6 @@ func adjacent_points()[][2]int{
     adjacent_coords := [][2]int{{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{-1,0},{-1,1}}
     return adjacent_coords
 }
+
+
 
