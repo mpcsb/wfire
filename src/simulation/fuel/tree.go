@@ -23,13 +23,13 @@ type tree_dynamic struct {
 type Tree_data struct {
 	ID      int
 	species string
-	coords  shared.Coord
+	Coords  shared.Coord
 	x_y     xy_coor
 	static  tree_static
 	dynamic tree_dynamic
 
 	north_facing string
-	neighbours   []int
+	Neighbours   []int
 }
 
 func CreateTree(id int, p shared.Coord, species string, tree_db map[string][5]float64) Tree_data {

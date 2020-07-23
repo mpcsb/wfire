@@ -1,6 +1,7 @@
 package shared
 
 import (
+	// "fmt"
 	"math"
 )
 
@@ -38,12 +39,38 @@ func stringInSlice(a string, list []string) bool {
     return false
 }
 
-
-func binterp(f map[[2]float64]float64,  x1, x2, y1, y2 float64, p Coord) float64 {
-	x , y := p.Lat, p.Lon
  
-	R1 := f[[2]float64{x1, y1}] + (x-x1)/(x2-x1)*(f[[2]float64{x2, y1}] - f[[2]float64{x1, y1}])
-	R2 := f[[2]float64{x1, y2}] + (x-x1)/(x2-x1)*(f[[2]float64{x2, y2}] - f[[2]float64{x1, y2}]) 
-	alt := R2 + (y-y2)/(y2-y1)*(R1-R2)
-	return alt
+
+func Min(a, b float64) float64 {
+    if a < b {
+        return a
+    }
+    return b
 }
+
+func Max(a, b float64) float64 {
+    if a > b {
+        return a
+    }
+    return b
+}
+
+
+func Linspace(lower, upper, num float64) []float64 {
+ 
+	lower = Min(lower, upper)
+	upper = Max(lower, upper) 
+	num_int := int(num) 
+
+	var array []float64
+	for i := 1; i <= num_int; i++ {
+		array = append(array, lower + float64(i) * (upper - lower)/ float64(num_int))
+	} 
+	return array
+}
+
+func adjacent_points()[][2]int{
+    adjacent_coords := [][2]int{{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{-1,0},{-1,1}}
+    return adjacent_coords
+}
+
