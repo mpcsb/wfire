@@ -74,3 +74,5 @@ func adjacent_points()[][2]int{
     return adjacent_coords
 }
 
+
+
