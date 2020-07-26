@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"math"
 	"testing"
-	"simulation/shared"
+	s "simulation/shared"
 )
 
 
 func TerrainForTest()(ter Terrain){
-	p1 := shared.Coord{Lat: 38.773613, Lon: -9.363429, Alt: 0.0}
-	p2 := shared.Coord{Lat: 38.813257, Lon: -9.324138, Alt: 0.0} 
+	p1 := s.Coord{Lat: 38.773613, Lon: -9.48429, Alt: 0.0}
+	p2 := s.Coord{Lat: 38.913257, Lon: -9.214138, Alt: 0.0} 
 	ter = GenerateTerrain(p1, p2, 100)
 	return ter
 }
@@ -21,9 +21,10 @@ func TestInterp(t *testing.T) {
 
 	X := 38.793613
 	Y := -9.343429
-	P := shared.Coord{Lat: X, Lon: Y, Alt:0.0}
+	P := s.Coord{Lat: X, Lon: Y, Alt:0.0}
   
 	interpolated, _, _ := ter.Binterp(P) 
+	fmt.Println(interpolated)
 	if math.IsNaN(interpolated){
 		t.Errorf("got NaN  %f", interpolated)
 	} 
@@ -33,8 +34,8 @@ func TestAdjacent(t *testing.T) {
 	ter := TerrainForTest()
 
 	X := 38.793613
-	Y := -9.343429
-	P := shared.Coord{Lat: X, Lon: Y, Alt:0.0}
+	Y := -9.3563429
+	P := s.Coord{Lat: X, Lon: Y, Alt:0.0}
   
 	lat0, lat1, lon0, lon1 := ter.Adjacent(P) 
 	out := []float64{lat0, lat1, lon0, lon1} 
@@ -68,7 +69,7 @@ func TestCoord2Alt(t *testing.T) {
 	Y := -9.363429 
 
 	val := 0.0
-	if h, ok := ter.Coord2Alt[shared.Coord2{Lat:X, Lon:Y}]; ok {
+	if h, ok := ter.Coord2Alt[s.Coord2{Lat:X, Lon:Y}]; ok {
 		val = h
 	} else{
 		t.Errorf("No key in map, %f", h)
@@ -81,8 +82,8 @@ func TestCoord2Alt(t *testing.T) {
 }
 
 func TestGenDimensions(t *testing.T) {
-	p1 := shared.Coord{Lat: 38.773613, Lon: -9.363429, Alt: 0.0}
-	p2 := shared.Coord{Lat: 38.813257, Lon: -9.324138, Alt: 0.0} 
+	p1 := s.Coord{Lat: 38.773613, Lon: -9.363429, Alt: 0.0}
+	p2 := s.Coord{Lat: 38.813257, Lon: -9.324138, Alt: 0.0} 
 	ter := GenerateTerrain(p1, p2, 100)
 
 	ter.GenDimensions(p1, p2) 

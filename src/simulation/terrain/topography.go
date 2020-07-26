@@ -7,13 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
+	"strconv" 
 	"sort"
-
-	"simulation/shared"
-	// "gonum.org/v1/gonum/spatial/vptree"
-
-	// "github.com/im7mortal/UTM"
+	"math"
+	"bytes"
+	"simulation/shared" 
 )
 
 type Coord_label struct{
@@ -56,11 +54,14 @@ func CallPythonScripts(p1, p2 shared.Coord, sample_size int, task string) {
 		fmt.Sprintf("%f", p2.Lon),
 		fmt.Sprintf("%d", sample_size))
 
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(string(out))
+		var out bytes.Buffer
+		var stderr bytes.Buffer
+		cmd.Stdout = &out
+		cmd.Stderr = &stderr
+		err := cmd.Run()
+		if err != nil {
+			fmt.Println(fmt.Sprint(err) + ": " + stderr.String()) 
+		}
 } 
 
 
@@ -102,7 +103,7 @@ func (t *Terrain) LatLon2Alt() {
 	t.Coord2Alt = make(map[shared.Coord2]float64, len(t.Coord_Type)) 
 
 	for i := range t.Coord_Type{
-		coord := shared.Coord2{Lat: t.Coord_Type[i].Coord.Lat, Lon: t.Coord_Type[i].Coord.Lon}
+		coord := shared.Coord2{Lat:t.Coord_Type[i].Coord.Lat, Lon:t.Coord_Type[i].Coord.Lon}
 		coord2alt[coord] = t.Coord_Type[i].Coord.Alt
 	}
  
@@ -168,13 +169,11 @@ func (t *Terrain) Uniques() {
 
 
 
-func (t *Terrain) Adjacent(p shared.Coord) (float64, float64, float64, float64){
-	lat := p.Lat
-	lon := p.Lon
+func (t *Terrain) Adjacent(p shared.Coord) (x1 float64, x2 float64, y1 float64, y2 float64){
 
 	var i int 
 	for i_lat, v := range t.SetLat{
-		if v >= lat{
+		if v >= p.Lat{
 			i = i_lat
 			break
 		}
@@ -182,18 +181,34 @@ func (t *Terrain) Adjacent(p shared.Coord) (float64, float64, float64, float64){
 
 	var j int
 	for i_lon, v := range t.SetLon{
-		if v >= lon{
+		if v <= p.Lon{
 			j = i_lon 
 			break
 		} 
 	}
 
-	if (i + 1 <= len(t.SetLon)) && (j + 1 <= len(t.SetLat)){
-		return t.SetLat[i-1], t.SetLat[i+1], t.SetLon[j-1], t.SetLon[j+1]
+	// latitude
+	if i == 0 {
+		x1 = t.SetLat[0]
+		x2 = t.SetLat[0]
+	} else 	if i == len(t.SetLat) {
+		x1 = t.SetLat[len(t.SetLat) - 1]
+		x2 = t.SetLat[len(t.SetLat) - 1]
 	} else{
-		return t.SetLat[i - 1], t.SetLat[i], t.SetLon[j- 1], t.SetLon[j ]
+		x1, x2 = t.SetLat[i-1], t.SetLat[i]
 	}
-	
+	// longitude
+	if j == 0 {
+		y1 = t.SetLon[0]
+		y2 = t.SetLon[0]
+	} else if j == len(t.SetLon) {
+		y1 = t.SetLat[len(t.SetLon) - 1]
+		y2 = t.SetLat[len(t.SetLon) - 1]
+	} else {
+		y1, y2 = t.SetLon[j-1], t.SetLon[j]
+	}
+
+	return x1, x2, y1, y2
 }
 
 
@@ -205,11 +220,18 @@ func (t Terrain) Binterp(target shared.Coord) (float64, float64, float64) {
 	y := target.Lon
 
 	x1, x2, y1, y2 := t.Adjacent(target)
-
+  
 	R1 := t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y1}] + (x-x1)/(x2-x1)*(t.Coord2Alt[shared.Coord2{Lat:x2, Lon:y1}]-t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y1}])
 	R2 := t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y2}] + (x-x1)/(x2-x1)*(t.Coord2Alt[shared.Coord2{Lat:x2, Lon:y2}]-t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y2}])
 	altitude := R2 + (y-y2)/(y2-y1)*(R1-R2)
 	
+	if math.IsNaN(altitude){
+		// altitude = t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y1}]
+		altitude = (t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y1}] + 
+					t.Coord2Alt[shared.Coord2{Lat:x1, Lon:y2}] + 
+					t.Coord2Alt[shared.Coord2{Lat:x2, Lon:y1}] + 
+					t.Coord2Alt[shared.Coord2{Lat:x2, Lon:y2}] ) * 0.25
+	}
 
 	R1 = t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y1}] + (x-x1)/(x2-x1)*(t.Coord2Slope[shared.Coord2{Lat:x2, Lon:y1}]-t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y1}])
 	R2 = t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y2}] + (x-x1)/(x2-x1)*(t.Coord2Slope[shared.Coord2{Lat:x2, Lon:y2}]-t.Coord2Slope[shared.Coord2{Lat:x1, Lon:y2}])
