@@ -65,7 +65,8 @@ images_lst = []
 for filename in images_sorted:
     images_lst.append(imageio.imread(filename))
 if len(images_lst) > 0:
-    imageio.mimsave('animation.gif', images_lst)
+    kargs = { 'duration': 0.15}
+    imageio.mimsave('animation.gif', images_lst, **kargs) 
 
 for filename in images_sorted + files_sorted:
     os.remove(filename)
