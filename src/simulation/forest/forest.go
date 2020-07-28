@@ -48,7 +48,7 @@ func (p TreeCoord) Distance(c vptree.Comparable) float64 {
 func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
 	rand.Seed(1999) 
 	t := terrain.GenerateTerrain(p1, p2, samples) // terrain should not be controlled by samples, but instead by SRTM resolution
-
+ 
 	treeDimensions := loadTreeDimensions()  
 
 	// We can divide the range of latitudes or coordinates by width and length
@@ -86,7 +86,8 @@ func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
 				id += 1
 			}
 		}
-	} 
+	}
+
 	f.DetermineSample(10000)
 	// f.GetNeighbours(3.0)
 	f.RecordFrame()

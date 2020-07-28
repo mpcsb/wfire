@@ -195,37 +195,20 @@ func (t *Terrain) Adjacent(p shared.Coord) (x1 float64, x2 float64, y1 float64, 
 		x2 = t.SetLat[1]
 	} else 	if i == len(t.SetLat) {
 		x1 = t.SetLat[len(t.SetLat) - 1]
-		x2 = t.SetLat[len(t.SetLat)]
-		// if !(x1 <= p.Lat && p.Lat<= x2) {
-		// 	fmt.Println("fail2", x1, p.Lat, x2)
-		// }
+		x2 = t.SetLat[len(t.SetLat)] 
 	} else{
-		x1, x2 = t.SetLat[i-1], t.SetLat[i]
-		// if !(x1 <= p.Lat && p.Lat<= x2) {
-		// 	fmt.Println("fail3", x1, p.Lat, x2)
-		// }
+		x1, x2 = t.SetLat[i-1], t.SetLat[i] 
 	}
 	// longitude
 	if j == 0 {
 		y1 = t.SetLon[0]
-		y2 = t.SetLon[1] 
-		// if !(y1 <= p.Lon && p.Lon<= y2) {
-		// 	fmt.Println("Lon fail1", y1, p.Lon, y2)
-		// }
+		y2 = t.SetLon[1]  
 	} else if j == len(t.SetLon) {
 		y1 = t.SetLon[len(t.SetLon) - 1]
-		y2 = t.SetLon[len(t.SetLon)]
-		// if !(y1 <= p.Lon && p.Lon<= y2) {
-		// 	fmt.Println("fail2", y1, p.Lon, y2)
-		// }
+		y2 = t.SetLon[len(t.SetLon)] 
 	} else {
-		y1, y2 = t.SetLon[j-1], t.SetLon[j]
-		// if !(y1 <= p.Lon && p.Lon<= y2) {
-		// 	fmt.Println("fail3", y1, p.Lon, y2)
-		// }
-	}
-
-
+		y1, y2 = t.SetLon[j-1], t.SetLon[j] 
+	} 
 	return x1, x2, y1, y2
 }
 
@@ -299,7 +282,6 @@ func GenerateTerrain(p1, p2 shared.Coord, sample_size int) (t Terrain) {
 	t.GenDimensions(p1, p2) 
 	t.Uniques() 
 	t.LatLon2Alt()
-	t.HeightExtremes()
-
+	t.HeightExtremes() 
 	return t
 } 
