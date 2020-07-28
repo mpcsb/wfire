@@ -45,7 +45,8 @@ def plot3d(f, i):
         
         
     ax = Axes3D(plt.figure(figsize=(15, 15)))
-    ax.scatter(x, y, z, c=color, marker='^') 
+    ax.scatter(x, y, z, c=color, marker='^')
+    ax._axis3don = False
     ax.view_init(35, 60 + i*10)  
     plt.savefig(str(i) + '.png')
     plt.close()
