@@ -23,8 +23,7 @@ type Tree_dynamic struct {
 type Tree_data struct {
 	ID      int
 	species string
-	Coords  shared.Coord
-	// x_y     xy_coor
+	Coords  shared.Coord 
 	Static  Tree_static
 	Dynamic Tree_dynamic
 

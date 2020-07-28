@@ -46,7 +46,7 @@ func (p TreeCoord) Distance(c vptree.Comparable) float64 {
  
 
 func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
-	rand.Seed(19999) 
+	rand.Seed(1999) 
 	t := terrain.GenerateTerrain(p1, p2, samples) // terrain should not be controlled by samples, but instead by SRTM resolution
 
 	treeDimensions := loadTreeDimensions()  
@@ -58,14 +58,25 @@ func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
  
 
 	id := 0 
-	for _, lat := range latitudes{
-		for _, lon := range longitudes {
+	for i_lat, lat := range latitudes{
+		if i_lat < 2 {continue}
+		if i_lat > len(latitudes)-3 {continue}
+
+		for i_lon, lon := range longitudes {
+			if i_lon < 2 {continue}
+			if i_lon > len(longitudes)-3 {continue}
+
 			if rand.Float64() > 0.1 {
 				continue
 			} else {
 				// binterp interpolates alt, slope, aspect given lat and lon
 				alt, _, _ := t.Binterp(shared.Coord{Lat:lat, Lon:lon, Alt:0.0})
- 
+				if (alt < t.MinHeight) { 
+					alt = t.MinHeight
+				}
+				if (alt > t.MaxHeight) {
+					alt = t.MaxHeight
+				}
 				tree := fuel.CreateTree(id, shared.Coord{Lat:lat, Lon:lon, Alt:alt}, "pine", treeDimensions)
  
 				f.Tree_lst = append(f.Tree_lst, tree) 
@@ -77,7 +88,7 @@ func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
 		}
 	} 
 	f.DetermineSample(10000)
-	f.GetNeighbours(3.0)
+	// f.GetNeighbours(3.0)
 	f.RecordFrame()
 	
 	return f
