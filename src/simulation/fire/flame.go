@@ -22,11 +22,11 @@ func (f *Flame) DetermineShape(w weather.Wind) {
 	c, p := Perimeter(20, w.Speed, w.Direction)
 
 	for _, point := range c {
-		newPoint := NewCoord_XY(pos, point[0], point[1])
+		newPoint := NewCoordXY(pos, point[0], point[1])
 		f.circle = append(f.circle, newPoint)
 	}
 	for _, point := range p {
-		newPoint := NewCoord_XY(pos, point[0], point[1])
+		newPoint := NewCoordXY(pos, point[0], point[1])
 		f.parabola = append(f.parabola, newPoint)
 	}
 }

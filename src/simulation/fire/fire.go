@@ -20,6 +20,6 @@ func (f *Flame) MergeFronts(fire []Flame) {
 		//factor += 1.0
 	}
 
-	f.Height = s.Sigmoid(factor)
+	f.Height = s.Sigmoid(factor*0.8) * 50
 	f.UpdateTemperature()
 }

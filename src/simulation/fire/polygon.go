@@ -71,6 +71,7 @@ func doIntersect(p1, q1, p2, q2 s.Coord) bool {
 	return false // Doesn't fall in any of the above cases
 }
 
+// IsInside determines if a point p is within a given polygon
 func (f Flame) IsInside(contour []s.Coord, p s.Coord) bool {
 	// There must be at least 3 vertices in polygon[]
 	n := len(contour)
@@ -80,7 +81,7 @@ func (f Flame) IsInside(contour []s.Coord, p s.Coord) bool {
 
 	// Count intersections of the above line with sides of polygon
 	count := 0
-	for i, _ := range contour {
+	for i := range contour {
 		next := (i + 1) % n
 		// Check if the line segment from 'p' to 'extreme' intersects
 		// with the line segment from 'polygon[i]' to 'polygon[next]'
@@ -91,7 +92,7 @@ func (f Flame) IsInside(contour []s.Coord, p s.Coord) bool {
 			if orientation(contour[i], p, contour[next]) == 0 {
 				return onSegment(contour[i], p, contour[next])
 			}
-			count += 1
+			count++
 		}
 		i = next
 	}
