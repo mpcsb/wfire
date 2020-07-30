@@ -1,9 +1,9 @@
 package weather
 
-import "simulation/shared"
+import s "simulation/shared"
 
-type wind struct {
-	direction float64
-	speed     float64
-	coords    shared.Coord
+type Wind struct {
+	Direction float64
+	Speed     float64
+	CoordS    s.Coord
 }
