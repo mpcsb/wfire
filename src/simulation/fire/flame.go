@@ -9,7 +9,7 @@ type Flame struct {
 	Coord            s.Coord
 	Height           float64
 	Direction        float64 // this should be a polygon shape close like an (circumpherence to ellipsoid) under a force
-	Length           float64
+	Radius           float64
 	FlameTemperature float64
 	circle           []s.Coord // perimeter composed of a list of 2d coordinates: parabola + circumpherence
 	parabola         []s.Coord
@@ -28,4 +28,9 @@ func (f *Flame) DetermineShape(w weather.Wind) {
 		new_point := NewCoord_XY(pos, point[0], point[1])
 		f.parabola = append(f.parabola, new_point)
 	}
+}
+
+
+func (f *Flame) UpdateTemperature(){
+	
 }

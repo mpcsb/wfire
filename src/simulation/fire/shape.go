@@ -43,7 +43,7 @@ func circle(n_points int) (perimeter [][]float64) {
 func parabola(n_points int, speed, alpha float64) (perimeter [][]float64) {
 	var parabola [][]float64
 	for _, p := range Equidistant(-2.0, 2.0, n_points) {
-		parabola = append(parabola, []float64{float64(p), float64(math.Pow(2.0, 2) - math.Pow(p, 2.0))})
+		parabola = append(parabola, []float64{float64(p), speed * (float64(math.Pow(2.0, 2) - math.Pow(p, 2.0)))})
 	}
 
 	// reflect and compress parabola to match unit circle
