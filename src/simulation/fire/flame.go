@@ -5,6 +5,7 @@ import (
 	"simulation/weather"
 )
 
+// Flame contains flame related information such as coordinates and size
 type Flame struct {
 	Coord            s.Coord
 	Height           float64
@@ -15,22 +16,24 @@ type Flame struct {
 	parabola         []s.Coord
 }
 
-// flame and wind interaction
+// DetermineShape implements flame and wind interaction
 func (f *Flame) DetermineShape(w weather.Wind) {
 	pos := f.Coord
 	c, p := Perimeter(20, w.Speed, w.Direction)
 
 	for _, point := range c {
-		new_point := NewCoord_XY(pos, point[0], point[1])
-		f.circle = append(f.circle, new_point)
+		newPoint := NewCoord_XY(pos, point[0], point[1])
+		f.circle = append(f.circle, newPoint)
 	}
 	for _, point := range p {
-		new_point := NewCoord_XY(pos, point[0], point[1])
-		f.parabola = append(f.parabola, new_point)
+		newPoint := NewCoord_XY(pos, point[0], point[1])
+		f.parabola = append(f.parabola, newPoint)
 	}
 }
 
-
-func (f *Flame) UpdateTemperature(){
-	
+// UpdateTemperature implements the relation between flame size and temperature
+// 1 meter = 800ºc; 50 meter=1200ºc
+func (f *Flame) UpdateTemperature() {
+	m := 8.0 // 400ºC/50 m
+	f.FlameTemperature = 800 + m*f.Height
 }

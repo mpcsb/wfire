@@ -5,17 +5,13 @@ import (
 	"math"
 )
 
-// func Distance(p1 point, p2 point) float64 {
-// 	d := 0.0
-// 	return d
-// }
+// Sigmoid function
+func Sigmoid(x float64) (sig float64) {
+	sig = x / (1 + Abs(x))
+	return sig
+}
 
-// func CoordToDistance(c1 Coord) (float64, float64) {
-// 	x := 0.0
-// 	y := 0.0
-// 	return x, y
-// }
-
+// Haversine implements distance between two coordinates in meters
 func Haversine(lat1, lon1, lat2, lon2 float64) float64 {
 	const r = 6371000 // m
 	sdLat := math.Sin(Radians(lat2-lat1) / 2)
