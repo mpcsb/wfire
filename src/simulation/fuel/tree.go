@@ -1,29 +1,32 @@
 package fuel
 
-import "simulation/shared"
-
-// type xy_coor struct {
-// 	x, y float64
-// }
+import (
+	"math"
+	"simulation/fire"
+	s "simulation/shared"
+)
 
 type Tree_static struct {
-	Height                 float64 //https://en.wikipedia.org/wiki/Tree_measurement#Tree_databases
-	Diameter_breast_height float64
-	Bark_thickness         float64
-	Crown_radius           float64
-	Flammability           float64 //https://fireandemergency.nz/at-home/flammability-of-plant-species/
+	Height               float64 //https://en.wikipedia.org/wiki/Tree_measurement#Tree_databases
+	DiameterBreastHeight float64
+	BarkThickness        float64
+	CrownRadius          float64
+	Flammability         float64 //https://fireandemergency.nz/at-home/flammability-of-plant-species/
+	SparsenessFactor     float64
 }
 
 type Tree_dynamic struct {
 	Moisture float64
 	State    string // tree, burning, ember, burnt
-	Biomass  float64
+	Trunk    float64
+	Canopy   float64
+	Flame    fire.Flame
 }
 
 type Tree_data struct {
 	ID      int
 	species string
-	Coords  shared.Coord 
+	Coords  s.Coord
 	Static  Tree_static
 	Dynamic Tree_dynamic
 
@@ -31,44 +34,45 @@ type Tree_data struct {
 	Neighbours   []int
 }
 
-func CreateTree(id int, p shared.Coord, species string, tree_db map[string][5]float64) Tree_data {
+func CreateTree(id int, p s.Coord, species string, tree_db map[string][5]float64) Tree_data {
 	t := Tree_data{ID: id}
 	t.species = species
-	t.Coords = shared.Coord{Lat:p.Lat, Lon:p.Lon, Alt:p.Alt}
+	t.Coords = s.Coord{Lat: p.Lat, Lon: p.Lon, Alt: p.Alt}
 
-	t.InitStatic(tree_db)
-	t.InitBiomass()
+	t.initStatic(tree_db)
+	t.initBiomass()
 	return t
 }
 
-func (t *Tree_data) InitStatic(tree_db map[string][5]float64) {
+func (t *Tree_data) initStatic(tree_db map[string][5]float64) {
 	dims := tree_db[t.species]
 
 	t.Static.Height = dims[0]
-	t.Static.Diameter_breast_height = dims[1]
-	t.Static.Bark_thickness = dims[2]
-	t.Static.Crown_radius = dims[3]
+	t.Static.DiameterBreastHeight = dims[1]
+	t.Static.BarkThickness = dims[2] * 100 // conversion to meter
+	t.Static.CrownRadius = dims[3]
 	t.Static.Flammability = dims[4]
+	t.Static.SparsenessFactor = 0.2
+	// t.Static.SparsenessFactor = dims[5]
 }
 
-func (t *Tree_data) InitBiomass() {
-	t.Dynamic.Biomass = t.Static.Height * t.Static.Diameter_breast_height * t.Static.Crown_radius
+// InitBiomass implements estimates of biomass belonging to:
+// trunk: basic volumetric estimate
+// Canopy: half of tree height * crown radius * how sparse the tree is
+func (t *Tree_data) initBiomass() {
+	t.Dynamic.Trunk = t.Static.Height * math.Pi * math.Pow(t.Static.DiameterBreastHeight, 2) / 4.0
+	t.Dynamic.Canopy = (0.5 * t.Static.Height) * (math.Pi * math.Pow(t.Static.CrownRadius, 2) / 4.0) * t.Static.SparsenessFactor
+
 	t.Dynamic.State = "tree"
 }
 
 func (t *Tree_data) UpdateMoisture(temperature float64) {
-	temperature_diff := temperature - 25.0 // 25ºC to be defined
+	temperature_diff := temperature - 25.0 // 25ºC. This would be an equilibirum point where no water transfers occur
 	diff := 0.0
 	if temperature_diff > 0 {
 		diff = 0.01 * temperature_diff
 	} else {
 		diff = 0
 	}
-	t.Dynamic.Moisture = t.Dynamic.Moisture - diff
+	t.Dynamic.Moisture = t.Dynamic.Moisture - (diff / t.Static.BarkThickness)
 }
-
-
-// type tree interface {
-// 	CreateTree()
-// 	UpdateMoisture()
-// }

@@ -1,19 +1,20 @@
 package fire
 
 import (
+	"math"
 	s "simulation/shared"
 	"simulation/weather"
 )
 
 // Flame contains flame related information such as coordinates and size
 type Flame struct {
-	Coord            s.Coord
-	Height           float64
-	Direction        float64 // this should be a polygon shape close like an (circumpherence to ellipsoid) under a force
-	Radius           float64
+	Coord       s.Coord
+	Height      float64
+	Direction   float64 // this should be a polygon shape close like an (circumpherence to ellipsoid) under a force
+	Radius      float64
 	Temperature float64
-	circle           []s.Coord // perimeter composed of a list of 2d coordinates: parabola + circumpherence
-	parabola         []s.Coord
+	circle      []s.Coord // perimeter composed of a list of 2d coordinates: parabola + circumpherence
+	parabola    []s.Coord
 }
 
 // DetermineShape implements flame and wind interaction
@@ -39,17 +40,20 @@ func (f *Flame) UpdateTemperature() {
 }
 
 // UpdateWindTemperature will update the wind temperature located nearby a set of flames
-// Fourier’s law determines that temperature varies
-func (f *Flame) UpdateWindTemperature(wm *WindMap) {
-	lat1 =: f.Coord.Lat
-	lon1 =: f.Coord.Lon
+// Fourier’s law determines that temperature varies inversely to distance
+// if angle is negative, that flame will have no impact in the added temperature
+func UpdateWindTemperature(f Flame, wm map[s.Coord]weather.Wind) (dTemperature float64) {
+
+	lat1 := f.Coord.Lat
+	lon1 := f.Coord.Lon
 	for _, w := range wm {
 		wLat := w.Coord.Lat
 		wLon := w.Coord.Lon
 		distance := s.Abs(s.Haversine(lat1, lon1, wLat, wLon))
-		angle := math.Cos(s.Angle(lat1, lon1, wLat, wLon)) 
-		if angle > 0{
-			w.Temperature = f.Temperature * angle/ distance
+		angle := math.Cos(s.Angle(lat1, lon1, wLat, wLon))
+		if angle > 0 {
+			dTemperature = f.Temperature * angle / distance
 		}
-	}  
+	}
+	return dTemperature
 }
