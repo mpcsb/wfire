@@ -11,7 +11,7 @@ type Flame struct {
 	Height           float64
 	Direction        float64 // this should be a polygon shape close like an (circumpherence to ellipsoid) under a force
 	Radius           float64
-	FlameTemperature float64
+	Temperature float64
 	circle           []s.Coord // perimeter composed of a list of 2d coordinates: parabola + circumpherence
 	parabola         []s.Coord
 }
@@ -35,5 +35,21 @@ func (f *Flame) DetermineShape(w weather.Wind) {
 // 1 meter = 800ºc; 50 meter=1200ºc
 func (f *Flame) UpdateTemperature() {
 	m := 8.0 // 400ºC/50 m
-	f.FlameTemperature = 800 + m*f.Height
+	f.Temperature = 800 + m*f.Height
+}
+
+// UpdateWindTemperature will update the wind temperature located nearby a set of flames
+// Fourier’s law determines that temperature varies
+func (f *Flame) UpdateWindTemperature(wm *WindMap) {
+	lat1 =: f.Coord.Lat
+	lon1 =: f.Coord.Lon
+	for _, w := range wm {
+		wLat := w.Coord.Lat
+		wLon := w.Coord.Lon
+		distance := s.Abs(s.Haversine(lat1, lon1, wLat, wLon))
+		angle := math.Cos(s.Angle(lat1, lon1, wLat, wLon)) 
+		if angle > 0{
+			w.Temperature = f.Temperature * angle/ distance
+		}
+	}  
 }

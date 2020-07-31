@@ -28,7 +28,7 @@ func NewCoordXY(p s.Coord, dx, dy float64) s.Coord {
 	return newCoord
 }
 
-func circle(nPoints int) (perimeter [][]float64) {
+func circle(nPoints int, speed float64) (perimeter [][]float64) {
 	var p []float64
 	for _, d := range equidistant(0, 360, nPoints) {
 		p[0] = math.Cos(s.Radians(d))

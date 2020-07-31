@@ -21,6 +21,11 @@ func Haversine(lat1, lon1, lat2, lon2 float64) float64 {
 	return d //  m
 }
 
+func Angle(lat1, lon1, lat2, lon2 float64) float64 {
+	dlon := lon1 - lon2
+	return math.Atan2(math.Sin(Radians(dlon))*math.Cos(Radians(lat2)), math.Cos(Radians(lat1))*math.Sin(Radians(lat2))-math.Sin(Radians(lat1))*math.Cos(Radians(lat2))*math.Cos(Radians(dlon)))
+}
+
 func Radians(d float64) float64 {
 	return d * math.Pi / 180
 }
