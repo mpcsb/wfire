@@ -13,9 +13,9 @@ import (
 )
 
 type Forest struct {
-	Tree_lst     []fuel.Tree_data
-	Tree_Coords  []vptree.Comparable
-	VP           vptree.Tree
+	Tree_lst    []fuel.Tree_data
+	Tree_Coords []vptree.Comparable
+	// VP           vptree.Tree
 	Frame        int
 	Sample_trees []int
 }
@@ -70,6 +70,7 @@ func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
 				continue
 			}
 
+			// forest density: 0.1 is somewhat light, but realistic
 			if rand.Float64() > 0.1 {
 				continue
 			} else {
@@ -101,13 +102,13 @@ func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
 
 func (f *Forest) GetNeighbours(d float64) {
 	// handle vp, err :=....
-	f.VP, _ = vptree.New(f.Tree_Coords, 0, nil)
+	VP, _ := vptree.New(f.Tree_Coords, 0, nil)
 	fmt.Println("VP found")
 
 	for i, q := range f.Tree_Coords {
 		var keep vptree.Keeper
 		keep = vptree.NewDistKeeper(d)
-		f.VP.NearestSet(keep, q)
+		VP.NearestSet(keep, q)
 
 		for _, neighbour_tree := range keep.(*vptree.DistKeeper).Heap {
 			tree := neighbour_tree.Comparable.(TreeCoord)

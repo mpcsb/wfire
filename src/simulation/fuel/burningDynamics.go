@@ -1,22 +1,25 @@
 package fuel
 
 import (
+	// "fmt"
 	"math/rand"
 	"simulation/fire"
+
 	s "simulation/shared"
 	"simulation/weather"
 )
 
+// Burn starts a fire in a tree: this is a 1m flame
 func (t *Tree_data) Burn(w weather.Wind) {
 	t.Dynamic.Flame = fire.Flame{Coord: t.Coords, Height: 1.0, Direction: w.Direction, Radius: 1.0, Temperature: 800.0}
 	t.Dynamic.State = "burning"
 }
 
-func (t *Tree_data) Burning(w weather.Wind) {
+func (t *Tree_data) Burning(w weather.Wind) (emberPosition s.Coord) {
 	if rand.Float64() > 0.05 {
-		t.emitEmber(w)
+		emberPosition = t.emitEmber(w)
 	}
-
+	return emberPosition
 }
 
 // EmitEmber is called when a tree is burning
@@ -43,3 +46,7 @@ func (t *Tree_data) emitEmber(w weather.Wind) s.Coord {
 	// 	}
 	// }
 }
+
+// func (t *Tree_data) FirePotential(t terrain.Terrain, f forest.Forest) {
+// 	fmt.Println(t.Length, f.Frame)
+// }
