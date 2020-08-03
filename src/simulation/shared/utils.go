@@ -74,7 +74,17 @@ func Linspace(lower, upper, num float64) []float64 {
 	return array
 }
 
-func adjacent_points() [][2]int {
-	adjacent_coords := [][2]int{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {-1, 0}, {-1, 1}}
-	return adjacent_coords
+// AdjacentPoints returns the adjacent coordinates in a grid
+func AdjacentPoints() [][2]int {
+	AdjacentCoords := [][2]int{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {-1, 0}, {-1, 1}}
+	return AdjacentCoords
+}
+
+// NewCoordXY receive a coordinate and deltas in X and Y and returns the corresponding coordinate
+func NewCoordXY(p Coord, dx, dy float64) Coord {
+	const r = 6371000
+	newLatitude := p.Lat + (dy/r)*(180/math.Pi)
+	newLongitude := p.Lon + (dx/r)*(180/math.Pi)/math.Cos(Radians(p.Lat))
+	newCoord := Coord{Lat: newLatitude, Lon: newLongitude, Alt: p.Alt}
+	return newCoord
 }

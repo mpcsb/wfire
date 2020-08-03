@@ -1,15 +1,11 @@
-package fire
-
-import (
-	s "simulation/shared"
-)
+package shared
 
 // https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 // Given three colinear points p, q, r, the function checks if
 // point q lies on line segment 'pr'
-func onSegment(p, q, r s.Coord) bool {
-	if q.Lat <= s.Max(p.Lat, r.Lat) && q.Lat >= s.Min(p.Lat, r.Lat) &&
-		q.Lon <= s.Max(p.Lon, r.Lon) && q.Lon >= s.Min(p.Lon, r.Lon) {
+func onSegment(p, q, r Coord) bool {
+	if q.Lat <= Max(p.Lat, r.Lat) && q.Lat >= Min(p.Lat, r.Lat) &&
+		q.Lon <= Max(p.Lon, r.Lon) && q.Lon >= Min(p.Lon, r.Lon) {
 		return true
 	}
 	return false
@@ -20,7 +16,7 @@ func onSegment(p, q, r s.Coord) bool {
 // 0 --> p, q and r are colinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-func orientation(p, q, r s.Coord) int {
+func orientation(p, q, r Coord) int {
 	val := (q.Lon-p.Lon)*(r.Lat-q.Lat) -
 		(q.Lat-p.Lat)*(r.Lon-q.Lon)
 
@@ -29,12 +25,12 @@ func orientation(p, q, r s.Coord) int {
 	}
 	if val > 0 {
 		return 1
-	} else {
-		return 2
 	}
+	return 2
+
 }
 
-func doIntersect(p1, q1, p2, q2 s.Coord) bool {
+func doIntersect(p1, q1, p2, q2 Coord) bool {
 	// Find the four orientations needed for general and
 	// special cases
 	o1 := orientation(p1, q1, p2)
@@ -72,12 +68,12 @@ func doIntersect(p1, q1, p2, q2 s.Coord) bool {
 }
 
 // IsInside determines if a point p is within a given polygon
-func (f Flame) IsInside(contour []s.Coord, p s.Coord) bool {
+func IsInside(contour []Coord, p Coord) bool {
 	// There must be at least 3 vertices in polygon[]
 	n := len(contour)
 
 	// Create a point for line segment from p to infinite
-	extreme := s.Coord{Lat: 90, Lon: p.Lon}
+	extreme := Coord{Lat: 90, Lon: p.Lon}
 
 	// Count intersections of the above line with sides of polygon
 	count := 0
@@ -100,7 +96,6 @@ func (f Flame) IsInside(contour []s.Coord, p s.Coord) bool {
 	// Return true if count is odd, false otherwise
 	if count%2 == 1 {
 		return true
-	} else {
-		return false
 	}
+	return false
 }

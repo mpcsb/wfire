@@ -19,19 +19,19 @@ func equidistant(a, b, n int) (points []float64) {
 	return points
 }
 
-// NewCoordXY receive a coordinate and deltas in X and Y and returns the corresponding coordinate
-func NewCoordXY(p s.Coord, dx, dy float64) s.Coord {
-	const r = 6371000
-	newLatitude := p.Lat + (dy/r)*(180/math.Pi)
-	newLongitude := p.Lon + (dx/r)*(180/math.Pi)/math.Cos(s.Radians(p.Lat))
-	newCoord := s.Coord{Lat: newLatitude, Lon: newLongitude, Alt: p.Alt}
-	return newCoord
-}
+// // NewCoordXY receive a coordinate and deltas in X and Y and returns the corresponding coordinate
+// func NewCoordXY(p s.Coord, dx, dy float64) s.Coord {
+// 	const r = 6371000
+// 	newLatitude := p.Lat + (dy/r)*(180/math.Pi)
+// 	newLongitude := p.Lon + (dx/r)*(180/math.Pi)/math.Cos(s.Radians(p.Lat))
+// 	newCoord := s.Coord{Lat: newLatitude, Lon: newLongitude, Alt: p.Alt}
+// 	return newCoord
+// }
 
-//circle calculates contour around tree
+//Circle calculates contour around tree
 // should consider wind speed: when no speed, should be larger
 // as there is more speed, should reduce the circle to a minnimum of 1
-func circle(nPoints int) (perimeter [][]float64) {
+func Circle(nPoints int) (perimeter [][]float64) {
 	var p []float64
 	for _, d := range equidistant(0, 360, nPoints) {
 		p[0] = math.Cos(s.Radians(d))
@@ -41,7 +41,8 @@ func circle(nPoints int) (perimeter [][]float64) {
 	return perimeter
 }
 
-func parabola(nPoints int, speed, alpha float64) (perimeter [][]float64) {
+// Parabola generates a 2nd order curve to simulate the dispersion of the flame under wind
+func Parabola(nPoints int, speed, alpha float64) (perimeter [][]float64) {
 	var parabola [][]float64
 	for _, p := range equidistant(-2.0, 2.0, nPoints) {
 		parabola = append(parabola, []float64{float64(p), speed * (float64(math.Pow(2.0, 2) - math.Pow(p, 2.0)))})
@@ -59,8 +60,8 @@ func parabola(nPoints int, speed, alpha float64) (perimeter [][]float64) {
 
 // Perimeter returns the contours from the circle containing the tree and the parabola generated from the wind
 func Perimeter(nPoints int, speed, alpha float64) (c, p [][]float64) {
-	c = circle(nPoints)
-	p = parabola(nPoints, speed, alpha)
+	c = Circle(nPoints)
+	p = Parabola(nPoints, speed, alpha)
 
 	return c, p
 }

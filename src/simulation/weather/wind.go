@@ -5,6 +5,7 @@ import (
 	"simulation/terrain"
 )
 
+// Wind contains coordinates and information regarding speed and direction and also temperature
 type Wind struct {
 	Coord       s.Coord
 	Direction   float64
@@ -12,19 +13,9 @@ type Wind struct {
 	Temperature float64
 }
 
-// // UpdateWindTemperature will update the wind temperature located nearby a set of flames
-// func (w *Wind) UpdateWindTemperature(fire []Flame){
+// func (w *Wind) UpdateAdjacentWind() {
 
-// 	factor := 0.0
-// 	for _, flm := range fire {
-// 		factor += flm.Temperature
-// 	}
-// 	f.Height = s.Sigmoid(factor*0.01) * 100 // 100ºC seems to be the air temperature near fire fronts
-//  }
-
-func (w *Wind) UpdateAdjacentWind() {
-
-}
+// }
 
 // WindGeneration should have some minimum threshold on the amount of detail. It's not realistic to have more than 100 m of detail
 // this will be replaced by a ML model that ingests WindNinja models and returns wind maps
