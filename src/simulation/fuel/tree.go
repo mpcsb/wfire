@@ -23,6 +23,7 @@ type Tree_dynamic struct {
 	Flame    fire.Flame
 }
 
+// Tree_data holds static and dynamic information about each tree
 type Tree_data struct {
 	ID      int
 	species string
@@ -30,22 +31,24 @@ type Tree_data struct {
 	Static  Tree_static
 	Dynamic Tree_dynamic
 
-	North_facing string
-	Neighbours   []int
+	Aspect     string
+	Neighbours []int
 }
 
-func CreateTree(id int, p s.Coord, species string, tree_db map[string][5]float64) Tree_data {
+// CreateTree generates a tree based on tree_db details
+func CreateTree(id int, p s.Coord, species string, treeDB map[string][5]float64) Tree_data {
 	t := Tree_data{ID: id}
 	t.species = species
 	t.Coords = s.Coord{Lat: p.Lat, Lon: p.Lon, Alt: p.Alt}
 
-	t.initStatic(tree_db)
+	t.initStatic(treeDB)
 	t.initBiomass()
+	t.Dynamic.State = "tree"
 	return t
 }
 
-func (t *Tree_data) initStatic(tree_db map[string][5]float64) {
-	dims := tree_db[t.species]
+func (t *Tree_data) initStatic(treeDB map[string][5]float64) {
+	dims := treeDB[t.species]
 
 	t.Static.Height = dims[0]
 	t.Static.DiameterBreastHeight = dims[1]
@@ -63,14 +66,14 @@ func (t *Tree_data) initBiomass() {
 	t.Dynamic.Trunk = t.Static.Height * math.Pi * math.Pow(t.Static.DiameterBreastHeight, 2) / 4.0
 	t.Dynamic.Canopy = (0.5 * t.Static.Height) * (math.Pi * math.Pow(t.Static.CrownRadius, 2) / 4.0) * t.Static.SparsenessFactor
 
-	t.Dynamic.State = "tree"
 }
 
+// UpdateMoisture controls the water content depending on the temperature of the surrounding temperature
 func (t *Tree_data) UpdateMoisture(temperature float64) {
-	temperature_diff := temperature - 25.0 // 25ºC. This would be an equilibirum point where no water transfers occur
+	temperatureDiff := temperature - 25.0 // 25ºC. This would be an equilibirum point where no water transfers occur
 	diff := 0.0
-	if temperature_diff > 0 {
-		diff = 0.01 * temperature_diff
+	if temperatureDiff > 0 {
+		diff = 0.01 * temperatureDiff
 	} else {
 		diff = 0
 	}

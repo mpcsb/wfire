@@ -1,11 +1,11 @@
 package fuel
 
-type shrub_static struct {
-	height       float32
-	surface_area float32
+type shrubStatic struct {
+	height      float32
+	surfaceArea float32
 }
 
-type shrub_dynamic struct {
+type shrubDynamic struct {
 	moisture float32
 	state    string
 }

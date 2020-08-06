@@ -1,7 +1,6 @@
 package forest
 
 import (
-	"fmt"
 	"math"
 
 	"math/rand"
@@ -42,7 +41,7 @@ func (p TreeCoord) Distance(c vptree.Comparable) float64 {
 	return math.Sqrt(math.Pow(Dxy, 2) + math.Pow(Dz, 2))
 }
 
-func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
+func ForestGeneration(p1, p2 shared.Coord, samples int, dist float64) (f Forest) {
 	rand.Seed(1999)
 	t := terrain.GenerateTerrain(p1, p2, samples) // terrain should not be controlled by samples, but instead by SRTM resolution
 
@@ -94,27 +93,10 @@ func ForestGeneration(p1, p2 shared.Coord, samples int) (f Forest) {
 	}
 
 	f.DetermineSample(10000)
-	f.GetNeighbours(3.0)
+
 	f.RecordFrame()
 
 	return f
-}
-
-func (f *Forest) GetNeighbours(d float64) {
-	// handle vp, err :=....
-	VP, _ := vptree.New(f.Tree_Coords, 0, nil)
-	fmt.Println("VP found")
-
-	for i, q := range f.Tree_Coords {
-		var keep vptree.Keeper
-		keep = vptree.NewDistKeeper(d)
-		VP.NearestSet(keep, q)
-
-		for _, neighbour_tree := range keep.(*vptree.DistKeeper).Heap {
-			tree := neighbour_tree.Comparable.(TreeCoord)
-			f.Tree_lst[i].Neighbours = append(f.Tree_lst[i].Neighbours, tree.ID)
-		}
-	}
 }
 
 func (f *Forest) DetermineSample(size int) {
