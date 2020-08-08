@@ -33,7 +33,7 @@ func loadTreeDimensions() map[string][5]float64 {
 	return treeDimensions
 }
 
-// merge TreeCoord with fuel.tree_data
+// Distance merge TreeCoord with fuel.tree_data
 func (p TreeCoord) Distance(c vptree.Comparable) float64 {
 	q := c.(TreeCoord)
 	Dxy := shared.Haversine(p.Lat, p.Lon, q.Lat, q.Lon)
@@ -41,7 +41,8 @@ func (p TreeCoord) Distance(c vptree.Comparable) float64 {
 	return math.Sqrt(math.Pow(Dxy, 2) + math.Pow(Dz, 2))
 }
 
-func ForestGeneration(p1, p2 shared.Coord, samples int, dist float64) (f Forest) {
+// Generation implements terrain and generates trees in a metered grid, forming a forest
+func Generation(p1, p2 shared.Coord, samples int, dist float64) (f Forest) {
 	rand.Seed(1999)
 	t := terrain.GenerateTerrain(p1, p2, samples) // terrain should not be controlled by samples, but instead by SRTM resolution
 
